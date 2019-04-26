@@ -1,3 +1,3 @@
 # 2019-1-OSSP2-Openthedoor-7
 
-미란
+game program using fack tracker
