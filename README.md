@@ -1,6 +1,7 @@
 # 2019-1-OSSP2-Openthedoor-7
 
 game program using face tracker
+FaceTracker URL:https://github.com/kylemcdonald/FaceTracker
 
 #4.27
 -facetracker.cc 
