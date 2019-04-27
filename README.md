@@ -1,6 +1,6 @@
 # 2019-1-OSSP2-Openthedoor-7
 
-game program using fack tracker
+game program using face tracker
 
 #4.27
 -facetracker.cc 
