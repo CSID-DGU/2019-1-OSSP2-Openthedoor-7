@@ -1,7 +1,7 @@
 # 2019-1-OSSP2-Openthedoor-7
 ###game program using face tracker
 
-<h3>오픈소스 출처</h3>
+### 오픈소스 출처
 ------------------------------------------------------------
 FaceTracker
 https://github.com/kylemcdonald/FaceTracker
@@ -10,12 +10,12 @@ https://github.com/opencv/opencv
 OpenGL
 
 
-###개발 환경
+### 개발 환경
 ------------------------------------------------------------
 Develop Tool:C++
 Develop Environment:Ubuntu Linux
 
-###시작하기
+### 시작하기
 ------------------------------------------------------------
 (https://github.com/opencv/opencv "OpenCV")를 설치합니다.
 <pre>
@@ -24,7 +24,7 @@ $ cd FaceTracker
 $ make   # 옵션을 추가해서 빌드시 에러 발생 
 </pre>
 
-##실행하기
+### 실행하기
 -------------------------------------------------------------
 <pre>
 $ cd bin
