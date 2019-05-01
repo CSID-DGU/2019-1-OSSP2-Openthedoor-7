@@ -2,7 +2,7 @@
 ###game program using face tracker
 
 ### 오픈소스 출처
-------------------------------------------------------------
+* * *
 FaceTracker
 https://github.com/kylemcdonald/FaceTracker
 OpenCV
