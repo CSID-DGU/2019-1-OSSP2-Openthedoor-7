@@ -1,8 +1,8 @@
 # 2019-1-OSSP2-Openthedoor-7
-###game program using face tracker
+### game program using face tracker
 
 ### 오픈소스 출처
-* * *
+*************************
 FaceTracker
 https://github.com/kylemcdonald/FaceTracker
 OpenCV
