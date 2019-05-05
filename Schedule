@@ -3,4 +3,7 @@
 -facetracker.cc : 주석 파일 업로드 및 예외처리 추가
 
 #5.1
--OpenCV를 배경으로 사용하는 OpenGL 링크 함수 구현 
+-OpenCV를 배경으로 사용하는 OpenGL 링크 함수 구현
+
+#5.5
+-OpenGL + OpenCV 호환 함수 구현, 움직이는 도형 FaceTracker 출력 함수 구현
