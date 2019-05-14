@@ -7,3 +7,8 @@
 
 #5.5
 -OpenGL + OpenCV 호환 함수 구현, 움직이는 도형 FaceTracker 출력 함수 구현
+
+#5.10
+-OpenCV 기반 Facetracker를 openGL과 호환가능하도록 수정(matTotexture 구현)
+
+-랜덤으로 떨어지는 공 + 웹캠 + facetracker 조합 
