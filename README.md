@@ -10,8 +10,9 @@ OpenGL
 
 
 # 개발 환경
-Develop Tool:C++  
+Develop Tool:C++, Node.js, MySQL, aws ec2, aws RDS
 Develop Environment:Ubuntu Linux  
+
 
 # 시작하기
 * (https://github.com/opencv/opencv "OpenCV")를 설치합니다.  
