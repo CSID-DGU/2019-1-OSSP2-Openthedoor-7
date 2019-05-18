@@ -96,7 +96,7 @@ GLfloat ystep; // 공의 속도
 
 float delta;
 float point_size = 3.0;
-GLenum draw_type;
+GLenum draw_type; 
 
 GLfloat Red, Green, Blue;  // glColor3f() 파라미터
 GLint ColorIndex;    // 색깔을 결정하는 배열 인덱스
@@ -434,118 +434,6 @@ void draw_background()
   glEnd();
 }
 
-void drawBitmapText(const char *str, float x, float y, float z)
-{
-  glRasterPos3f(x, y, z); //문자열이 그려질 위치 지정
-
-  while (*str)
-  {
-    //GLUT_BITMAP_TIMES_ROMAN_24 폰트를 사용하여 문자열을 그린다.
-    glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *str);
-
-    str++;
-  }
-}
-
-//큐브의 한 면, 화면 안쪽 방향인 -Z축방향으로 0.5이동하여 정사각형을 그린다.
-static void cubebase(void)
-{
-  glBegin(GL_QUADS);
-  glVertex3d(-0.5, -0.5, -0.5);
-  glVertex3d(-0.5, 0.5, -0.5);
-  glVertex3d(0.5, 0.5, -0.5);
-  glVertex3d(0.5, -0.5, -0.5);
-  glEnd();
-}
-
-//cubebase함수에서 그린 사각형을 회전 및 이동시켜
-//큐브를 완성시킨다.
-void draw_cube()
-{
-  glPushMatrix();
-
-  glColor3f(0.0f, 1.0f, 0.0f); // Green, -Z축 방향
-  cubebase();
-
-  glPushMatrix();
-
-  glTranslated(1.0, 0.0, 0.0);
-  glRotated(90.0, 0.0, 1.0, 0.0);
-  glColor3f(0.0f, 0.0f, 1.0f); // Blue, +X축 방향
-  cubebase();
-
-  glPopMatrix();
-
-  glPushMatrix();
-  glTranslated(-1.0, 0.0, 0.0);
-  glRotated(-90.0, 0.0, 1.0, 0.0);
-  glColor3f(1.0f, 0.5f, 0.0f); // Orange, -X축 방향
-  cubebase();
-  glPopMatrix();
-
-  glPushMatrix();
-  glTranslated(0.0, 1.0, 0.0);
-  glRotated(-90.0, 1.0, 0.0, 0.0);
-  glColor3f(1.0f, 0.0f, 0.0f); // Red, +Y축 방향
-  cubebase();
-  glPopMatrix();
-
-  glPushMatrix();
-  glTranslated(0.0, -1.0, 0.0);
-  glRotated(90.0, 1.0, 0.0, 0.0);
-  glColor3f(1.0f, 1.0f, 0.0f); // Yellow, -Y축 방향
-  cubebase();
-  glPopMatrix();
-
-  glBegin(GL_QUADS);
-  glColor3f(1.0f, 0.0f, 1.0f); // Magenta, +Z축 방향
-  glVertex3d(-0.5, -0.5, 0.5);
-  glVertex3d(0.5, -0.5, 0.5);
-  glVertex3d(0.5, 0.5, 0.5);
-  glVertex3d(-0.5, 0.5, 0.5);
-  glEnd();
-
-  glPopMatrix();
-
-  glFlush();
-}
-
-void draw_line()
-{
-
-  glPushMatrix(); //X축 붉은색
-  glColor3f(1.0, 0.0, 0.0);
-  glBegin(GL_LINES);
-  glVertex3f(1.0, 0.0, 0.0);
-  glVertex3f(-1.0, 0.0, 0.0);
-  glEnd();
-  drawBitmapText("+X", 0.8, 0.0, 0.0);
-  drawBitmapText("-X", -0.8, 0.0, 0.0);
-  glPopMatrix();
-
-  glPushMatrix(); //Y축 녹색
-  glColor3f(0.0, 1.0, 0.0);
-  glBegin(GL_LINES);
-  glVertex3f(0.0, 1.0, 0.0);
-  glVertex3f(0.0, -1.0, 0.0);
-  glEnd();
-  drawBitmapText("+Y", 0.0, 0.8, 0.0);
-  drawBitmapText("-Y", 0.0, -0.8, 0.0);
-  glPopMatrix();
-
-  glPushMatrix(); //Z축 파란색
-  glColor3f(0.0, 0.0, 1.0);
-  glBegin(GL_LINES);
-  glVertex3f(0.0, 0.0, 1.0);
-  glVertex3f(0.0, 0.0, -1.0);
-  glEnd();
-  drawBitmapText("+Z", 0.0, 0.0, 0.8);
-  drawBitmapText("-Z", 0.0, 0.0, -0.8);
-  glPopMatrix();
-
-  glFlush();
-}
-
 void display()
 {
   //화면을 지운다. (컬러버퍼와 깊이버퍼)
@@ -626,7 +514,8 @@ void reshape(GLsizei width, GLsizei height)
   // glMatrixMode(GL_MODELVIEW); //이후 연산은 ModelView Matirx에 영향을 준다.
   gluOrtho2D(-6, width/100, -4, height/100);
  // gluOrtho2D(45, (GLfloat)width / (GLfloat)height, 1.0, 100.0);
- 
+ //gluOrtho2D(-20, width, height, -20);
+
  
 }
 
