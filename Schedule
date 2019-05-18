@@ -12,3 +12,6 @@
 -OpenCV 기반 Facetracker를 openGL과 호환가능하도록 수정(matTotexture 구현)
 
 -랜덤으로 떨어지는 공 + 웹캠 + facetracker 조합 
+
+#5.18
+-코드 정리
