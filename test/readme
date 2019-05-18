@@ -1,0 +1,16 @@
+#1 밖에 있는 views 는 잘못 만든 것 
+-> 삭제 필요
+
+#2 선제 조건 
+ - (nvm), node js, npm, mysql
+ - mysql : database(openSW), table(users)
+ - nodejs modules : express, body-parser, node-mysql
+ - build environment: postman
+
+#3 create project (structure)
+ - after install node js , enter to terminal ' npm install -g express-generator '
+ - moving to make project location, enter to terminal 'npm init'
+ - then create project, and structure
+  (app.js , bin, node_modules, package-lock.json, package.json, public, routes, views)
+  
+
