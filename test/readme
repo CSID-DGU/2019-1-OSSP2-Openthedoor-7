@@ -1,16 +1,20 @@
-#1 밖에 있는 views 는 잘못 만든 것 
--> 삭제 필요
-
-#2 선제 조건 
+#1 Pre-condition
  - (nvm), node js, npm, mysql
  - mysql : database(openSW), table(users)
- - nodejs modules : express, body-parser, node-mysql
- - build environment: postman
+ - build environment: postman 
 
-#3 create project (structure)
+#2 create project (structure)
  - after install node js , enter to terminal ' npm install -g express-generator '
  - moving to make project location, enter to terminal 'npm init'
- - then create project, and structure
+   then create project, and structure
   (app.js , bin, node_modules, package-lock.json, package.json, public, routes, views)
+ - enter to termianl 'npm install' 
+   then packages in the package.json is installed  
+  
+#3 Proceeding
+ - register awd account, and create RDS.
+ - I will make view using jade or html or node 
+ 
+ 
   
 
