@@ -7,12 +7,13 @@ CXX=g++
 
 # Flags
 ARCH_FLAGS=
+
 CFLAGS=-Wextra -Wall $(ARCH_FLAGS) -O3 -Wno-long-long
 LDFLAGS=$(ARCH_FLAGS)
 DEFINES=
 INCLUDES=-I$(OPENCV_PATH)/include -Iinclude/
 LIBRARIES=-L$(OPENCV_PATH)/lib -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_objdetect
-
+LINKER_FLAGS = -lGL -lGLU -lglut -lm
 # Files which require compiling
 SOURCE_FILES=\
 	src/lib/IO.cc\
@@ -48,7 +49,7 @@ all: bin/face_tracker
 -include $(DEPENDENCY_FILES)
 
 bin/face_tracker: $(ALL_OBJECTS)
-	$(CXX) $(LDFLAGS)  -o $@ $(ALL_OBJECTS) $(LIBRARIES)
+	$(CXX) $(LDFLAGS) -o $@ $(ALL_OBJECTS) $(LIBRARIES) $(LINKER_FLAGS)
 
 .PHONY: clean
 clean:
