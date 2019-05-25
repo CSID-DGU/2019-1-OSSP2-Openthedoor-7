@@ -30,7 +30,7 @@ int first(char * myId, char * myPwd){
 	memset(&serv_addr, 0, sizeof(serv_addr));
 
 	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	serv_addr.sin_addr.s_addr = inet_addr("13.209.29.192");
 	serv_addr.sin_port = htons(3090);
 
 
