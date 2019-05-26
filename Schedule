@@ -21,3 +21,10 @@
 -MakeFile update
 server
  - create brunch 'hyex' fro server testing
+
+#5.25
+- 우분투 가상머신 없이 실행 환경 조성
+- OpenCV OpenGL 좌표 통일
+
+#5.26
+- 입과 도형 인식 이벤트 구현
