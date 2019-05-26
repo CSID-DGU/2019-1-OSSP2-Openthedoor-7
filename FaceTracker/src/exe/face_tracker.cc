@@ -54,6 +54,8 @@ int screenH;
 
 int score = 0;
 cv::Point pts[6];
+float xPts[6];
+float yPts[6];
 
 Mat im, tri, con;
 cv::VideoCapture camera;
@@ -223,6 +225,23 @@ void RandomMoving()
     }
   }
 }
+
+void CVtoGL(){
+
+  int w=1200;
+  int h=800;
+
+cout<<endl;
+for(int i=0;i<6;i++)
+{
+  xPts[i]= (float)(pts[i].x - (float)w / 2.0)/100.0;
+  yPts[i]=-(float)(pts[i].y - (float)h / 2.0)/100.0;
+  cout<<xPts[i]<<" "<<yPts[i]<<endl;
+}
+cout<<endl;
+
+}
+
 //=============================================================================
 void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &visi)
 { //Draw(im,model._shape,con,tri,model._clm._visi[idx]);
@@ -287,11 +306,11 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
     }
   }
 
-cout<<endl;
-  for(int i=0;i<pts_count;i++)
-  cout<<pts[i].x<<" "<<pts[i].y<<endl;
-cout<<endl;
-
+// cout<<endl;
+//   for(int i=0;i<pts_count;i++)
+//   cout<<pts[i].x<<" "<<pts[i].y<<endl;
+// cout<<endl;
+//CVtoGL();
   //영역의 크기 구하기
   c = CV_RGB(255, 0, 0);
   cv::fillConvexPoly(image, pts, 6, c);
@@ -434,8 +453,8 @@ GLuint MatToTexture(Mat image)
 
 void draw_background()
 {
-   int x = screenW / 100.0;
-   int y = screenH / 100.0;
+   int x = screenW ;
+   int y = screenH ;
 
 
   glBegin(GL_QUADS);
@@ -449,6 +468,7 @@ void draw_background()
   glVertex3f(-x, y, 0.0);
   glEnd();
 }
+
 
 void display()
 {
@@ -540,8 +560,8 @@ void reshape(GLsizei width, GLsizei height)
 
   // glMatrixMode(GL_MODELVIEW); //이후 연산은 ModelView Matirx에 영향을 준다.
   //gluOrtho2D(0, 12, 0, 8);
-  gluOrtho2D(-6, width / 100, -4, height / 100);
-  
+  gluOrtho2D(-640, 640, -480, 480);
+  //gluOrtho2D(-6, width / 100, -4, height / 100);
 }
 
 void timer(int value)
@@ -685,7 +705,7 @@ int main(int argc, char **argv)
     screenW = temp.cols;
    screenH = temp.rows;
 
-
+  
 
   glutInitWindowSize(screenW, screenH);
   //glutInitWindowPosition(100, 100);
