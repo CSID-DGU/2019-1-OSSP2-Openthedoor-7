@@ -52,6 +52,10 @@ using namespace std;
 int screenW;
 int screenH;
 
+int score=0;
+point mouthPts[3];
+
+
 Mat im, tri, con;
 cv::VideoCapture camera;
 FACETRACKER::Tracker *model;
@@ -223,6 +227,7 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
   cv::Scalar c;
   cv::Point pts[6];
   int pts_count = 0;
+  int mouth_cnt=0;
 
   //draw triangulation
   c = CV_RGB(0, 0, 0); //검정선
@@ -270,6 +275,11 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
     c = CV_RGB(255, 0, 0); //빨간 원
     cv::circle(image, p1, 2, c);
     //cv::putText(image,std::to_string(i),p1,CV_FONT_HERSHEY_COMPLEX,0.5,c); //인덱싱
+    if (i == 60 ||i == 62 || i == 63 || i == 65)
+    {
+      mouthPts[mouth_cnt++]=p1;
+    }
+    
     if (i == 60 || i == 61 || i == 62 || i == 63 || i == 64 || i == 65)
     {
       pts[pts_count++] = p1;
@@ -635,19 +645,19 @@ int main(int argc, char **argv)
   wSize2[0] = 11;
   wSize2[1] = 9;
   wSize2[2] = 7;
-  cout<<"start"<<endl;
+  
   model=new FACETRACKER::Tracker(ftFile);
    cout<<"tracker.cc"<<endl;
   tri = FACETRACKER::IO::LoadTri(triFile); //검정선 연결
   cout<<"loadtri.cc"<<endl;
   con = FACETRACKER::IO::LoadCon(conFile); //파란선 연결
-  cout << "1" << endl;
+  
   //initialize camera and display window
   cv::Mat temp;
 
   camera = cv::VideoCapture(CV_CAP_ANY);
   // camera = new VideoCapture(0);
-  cout << "2" << endl;
+  
 
   if (!camera.isOpened())
   { //카메라가 제대로 연결되지 않았다면 프로그램 종료
