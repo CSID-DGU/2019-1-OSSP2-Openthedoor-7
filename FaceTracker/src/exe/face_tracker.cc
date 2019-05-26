@@ -52,9 +52,8 @@ using namespace std;
 int screenW;
 int screenH;
 
-int score=0;
-point mouthPts[3];
-
+int score = 0;
+cv::Point pts[6];
 
 Mat im, tri, con;
 cv::VideoCapture camera;
@@ -73,12 +72,16 @@ bool failed = true;
 char sss[256];
 double fps = 0;
 std::string text;
-int64 t1, t0;//framerate 출력을 위한 변수
+int64 t1, t0; //framerate 출력을 위한 변수
 int fnum = 0;
 cv::Mat frame, gray;
 
-float width = 320.0;//윈도우 가로
-float height = 240.0;//윈도우 세로
+cv::Mat temp;
+//camera.read(temp);
+float width = temp.cols;  //윈도우 가로
+float height = temp.rows; //윈도우 세로
+/* float width = 780;//윈도우 가로
+float height = 600; */
 
 float standard_x = -10.0;
 float standard_y = -10.0;
@@ -87,7 +90,7 @@ float radius = 5.0;
 int num = 45;
 
 float radius1 = 20.0; //벽돌 반지름
-float radius2 = 10.0; // 이동하는 공의 반지름
+float radius2 = 0.2;  // 이동하는 공의 반지름
 
 float xp = 40.0;
 float yp = 40.0;
@@ -100,10 +103,10 @@ GLfloat ystep; // 공의 속도
 
 float delta;
 float point_size = 3.0;
-GLenum draw_type; 
+GLenum draw_type;
 
-GLfloat Red, Green, Blue;  // glColor3f() 파라미터
-GLint ColorIndex;    // 색깔을 결정하는 배열 인덱스
+GLfloat Red, Green, Blue; // glColor3f() 파라미터
+GLint ColorIndex;         // 색깔을 결정하는 배열 인덱스
 
 int a = rand() % 3;
 //int b = rand() % 3;
@@ -111,112 +114,114 @@ int a = rand() % 3;
 
 //9가지 색깔을 9 * 3 배열로 저장한다.
 unsigned char PALETTE[9][3] = {
- {   0, 255, 255 },  // CYAN
- {   0, 255,   0 },  // GREEN
- {   0,   0, 255 },  // BLUE
- { 255,   0,   0 },  // RED
- { 255, 190,   0 },  // Orange
- { 255, 255,   0 },  // YELLOW
- { 255,   0, 255 },  // PURPLE
- { 190,   0, 255 },  // Violet
- {   0,   0,   0 },  // BLACK
+    {0, 255, 255}, // CYAN
+    {0, 255, 0},   // GREEN
+    {0, 0, 255},   // BLUE
+    {255, 0, 0},   // RED
+    {255, 190, 0}, // Orange
+    {255, 255, 0}, // YELLOW
+    {255, 0, 255}, // PURPLE
+    {190, 0, 255}, // Violet
+    {0, 0, 0},     // BLACK
 };
 
 //색깔을 초기화 하는 함수
 void Color()
 {
-	Red = PALETTE[ColorIndex][0] / 255.0f;
-	Green = PALETTE[ColorIndex][1] / 255.0f;
-	Blue = PALETTE[ColorIndex][2] / 255.0f;
-	glColor3f(Red, Green, Blue);
+  Red = PALETTE[ColorIndex][0] / 255.0f;
+  Green = PALETTE[ColorIndex][1] / 255.0f;
+  Blue = PALETTE[ColorIndex][2] / 255.0f;
+  glColor3f(Red, Green, Blue);
 }
 
-void Draw_Circle() {
-	//glClear(GL_COLOR_BUFFER_BIT);
-	Color();
-	delta = 2.0*PI / num;
-	glBegin(GL_POLYGON);
-	for (int i = 0; i < num; i++) {
-		glVertex2f(cx + radius2 * cos(delta*i), cy + radius2 * sin(delta*i));
-	}
-	glEnd();
+void Draw_Circle()
+{
+  //glClear(GL_COLOR_BUFFER_BIT);
+  Color();
+  delta = 2.0 * PI / num;
+  glBegin(GL_POLYGON);
+  for (int i = 0; i < num; i++)
+  {
+    glVertex2f(cx + radius2 * cos(delta * i), cy + radius2 * sin(delta * i));
+  }
+  glEnd();
 }
 
 void Random()
 {
-	Draw_Circle();
+  if (a == 0) //위에서 떨어지는거
+  {
+    srand((unsigned int)time(NULL));
+    cx = rand() % 13 - 6;
+    cy = 4.2;
+  }
 
-	if (a == 0)//위에서 떨어지는거
-	{
-		srand((unsigned int)time(NULL));
-		cx = rand() % 741 + 10;
-		cy = -10;
-	}
+  else if (a == 1) //왼쪽에서 나오는거
+  {
+    srand((unsigned int)time(NULL));
+    cx = -6.2;
+    cy = rand() % 9 - 4;
+  }
 
-	else if (a == 1)//왼쪽에서 나오는거
-	{
-		srand((unsigned int)time(NULL));
-		cx = -30;
-		cy = rand() % 561+10;
-	}
+  else //오른쪽에서 나오는 거
+  {
+    srand((unsigned int)time(NULL));
+    cx = 6.2;
+    cy = rand() % 9 - 4;
+  }
 
-	else//오른쪽에서 나오는 거
-	{
-		srand((unsigned int)time(NULL));
-		cx = 600;
-		cy = rand() % 780 + 1;
-	}
+  Draw_Circle();
 }
 
 void RandomMoving()
 {
-	srand((unsigned int)time(NULL));
-	int l = rand() % 2;
+  srand((unsigned int)time(NULL));
+  int l = rand() % 2;
 
-	srand((unsigned int)time(NULL));
-	xstep = rand() % 5 + 1;
-	srand((unsigned int)time(NULL));
-	ystep = rand() % 5 + 1;
+  srand((unsigned int)time(NULL));
+  xstep = rand() % 1 + 0.4;
+  srand((unsigned int)time(NULL));
+  ystep = rand() % 1 + 0.4;
 
-	if (a == 0)
-	{
-		if (l == 0)
-		{
-			cx += xstep;
-			cy += ystep;
-		}
-		else
-		{
-			cx -= xstep;
-			cy += ystep;
-		}
-	}
-	else if (a == 1)
-	{
-		if (l == 0)
-		{
-			cx += xstep;
-			cy += ystep;
-		}
-		else
-		{
-			cx += xstep;
-			cy -= ystep;
-		}
-	}
-	else
-	{
-		if (l == 0)
-		{
-			cx -= xstep;
-			cy += ystep;
-		}
-		else
-		{
-			cx -= xstep;
-			cy -= ystep;
-		}
-	}
+  if (a == 0)
+  {
+    if (l == 0)
+    {
+      cx += xstep;
+      cy += ystep;
+    }
+    else
+    {
+      cx -= xstep;
+      cy += ystep;
+    }
+  }
+  else if (a == 1)
+  {
+    if (l == 0)
+    {
+      cx += xstep;
+      cy += ystep;
+    }
+    else
+    {
+      cx += xstep;
+      cy -= ystep;
+    }
+  }
+  else
+  {
+    if (l == 0)
+    {
+      cx -= xstep;
+      cy += ystep;
+    }
+    else
+    {
+      cx -= xstep;
+      cy -= ystep;
+    }
+  }
 }
 //=============================================================================
 void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &visi)
@@ -225,10 +230,9 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
   int i, n = shape.rows / 2;
   cv::Point p1, p2;
   cv::Scalar c;
-  cv::Point pts[6];
-  int pts_count = 0;
-  int mouth_cnt=0;
 
+  int pts_count = 0;
+  int mouth_cnt = 0;
   //draw triangulation
   c = CV_RGB(0, 0, 0); //검정선
   for (i = 0; i < tri.rows; i++)
@@ -275,11 +279,6 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
     c = CV_RGB(255, 0, 0); //빨간 원
     cv::circle(image, p1, 2, c);
     //cv::putText(image,std::to_string(i),p1,CV_FONT_HERSHEY_COMPLEX,0.5,c); //인덱싱
-    if (i == 60 ||i == 62 || i == 63 || i == 65)
-    {
-      mouthPts[mouth_cnt++]=p1;
-    }
-    
     if (i == 60 || i == 61 || i == 62 || i == 63 || i == 64 || i == 65)
     {
       pts[pts_count++] = p1;
@@ -287,6 +286,12 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
       cv::putText(image, std::to_string(i), p1, CV_FONT_HERSHEY_COMPLEX, 0.5, c);
     }
   }
+
+cout<<endl;
+  for(int i=0;i<pts_count;i++)
+  cout<<pts[i].x<<" "<<pts[i].y<<endl;
+cout<<endl;
+
   //영역의 크기 구하기
   c = CV_RGB(255, 0, 0);
   cv::fillConvexPoly(image, pts, 6, c);
@@ -429,8 +434,9 @@ GLuint MatToTexture(Mat image)
 
 void draw_background()
 {
-  int x = screenW / 100.0;
-  int y = screenH / 100.0;
+   int x = screenW / 100.0;
+   int y = screenH / 100.0;
+
 
   glBegin(GL_QUADS);
   glTexCoord2f(0.0, 1.0);
@@ -459,74 +465,83 @@ void display()
   glBindTexture(GL_TEXTURE_2D, texture_background);
   draw_background();
   //glDisable(GL_TEXTURE_2D);
- 	glPushMatrix();
+  glPushMatrix();
 
-	float deltaX = xp - cx;
-	float deltaY = yp - cy;
+  float deltaX = xp - cx;
+  float deltaY = yp - cy;
 
-	if (cx + radius2 > standard_x + width + 30) {//오른쪽벽과의 충돌여부
-		radius2 = NULL;							//충돌했다면 종료하고 새로 호출
-		//reset
-		radius2 = 10.0;
-		if (ColorIndex >= 8) ColorIndex = 0;
-		else    ColorIndex = ColorIndex + 1;
-		Random();
-	}
+  if (cx + radius2 > 6.4)
+  {                 //오른쪽벽과의 충돌여부
+    radius2 = NULL; //충돌했다면 종료하고 새로 호출
+    //reset
+    radius2 = 0.2;
+    if (ColorIndex >= 8)
+      ColorIndex = 0;
+    else
+      ColorIndex = ColorIndex + 1;
+    Random();
+  }
 
-	if (cx - radius2 < standard_x - 30) {//왼쪽벽
-		radius2 = NULL;
+  if (cx - radius2 < -6.4)
+  { //왼쪽벽
+    radius2 = NULL;
 
-		radius2 = 10.0;
-		if (ColorIndex >= 8) ColorIndex = 0;
-		else    ColorIndex = ColorIndex + 1;
-		Random();
-	}
+    radius2 = 0.2;
+    if (ColorIndex >= 8)
+      ColorIndex = 0;
+    else
+      ColorIndex = ColorIndex + 1;
+    Random();
+  }
 
-	if (cy + radius2 > standard_y + height + 30) {//바닥
-		radius2 = NULL;
+  if (cy + radius2 < -4.4)
+  { //바닥
+    radius2 = NULL;
 
-		radius2 = 10.0;
-		if (ColorIndex >= 8) ColorIndex = 0;
-		else    ColorIndex = ColorIndex + 1;
-		Random();
-	}
+    radius2 = 0.2;
+    if (ColorIndex >= 8)
+      ColorIndex = 0;
+    else
+      ColorIndex = ColorIndex + 1;
+    Random();
+  }
 
-	if (cy - radius2 < standard_y - 30) {//천장
-		radius2 = NULL;
+  if (cy - radius2 > 4.4)
+  { //천장
+    radius2 = NULL;
 
-		radius2 = 10.0;
-		if (ColorIndex >= 8) ColorIndex = 0;
-		else    ColorIndex = ColorIndex + 1;
-		Random();
-	}
+    radius2 = 0.2;
+    if (ColorIndex >= 8)
+      ColorIndex = 0;
+    else
+      ColorIndex = ColorIndex + 1;
+    Random();
+  }
 
-	RandomMoving();
+  RandomMoving();
 
-	glPointSize(point_size);
-	Draw_Circle();
-	glPopMatrix();
-	
+  glPointSize(point_size);
+  Draw_Circle();
+  glPopMatrix();
+
   //glFlush();
-	glutSwapBuffers();
-
+  glutSwapBuffers();
 }
 
 void reshape(GLsizei width, GLsizei height)
 {
+  //cv::Mat temp;
   glViewport(0, 0, (GLsizei)width, (GLsizei)height); //윈도우 크기로 뷰포인트 설정
-
-  glMatrixMode(GL_PROJECTION); //이후 연산은 Projection Matrix에 영향을 준다.
+  glMatrixMode(GL_PROJECTION);                       //이후 연산은 Projection Matrix에 영향을 준다.
   glLoadIdentity();
 
   //Field of view angle(단위 degrees), 윈도우의 aspect ratio, Near와 Far Plane설정
   // gluPerspective(45, (GLfloat)width / (GLfloat)height, 1.0, 100.0);
 
   // glMatrixMode(GL_MODELVIEW); //이후 연산은 ModelView Matirx에 영향을 준다.
-  gluOrtho2D(-6, width/100, -4, height/100);
- // gluOrtho2D(45, (GLfloat)width / (GLfloat)height, 1.0, 100.0);
- //gluOrtho2D(-20, width, height, -20);
-
- 
+  //gluOrtho2D(0, 12, 0, 8);
+  gluOrtho2D(-6, width / 100, -4, height / 100);
+  
 }
 
 void timer(int value)
@@ -536,7 +551,7 @@ void timer(int value)
   //grab image, resize and flip
   camera.read(frame); //frame 변수에 카메라 읽어온 값을 넣음
 
-   if (scale == 1)
+  if (scale == 1)
   {
     im = frame;
   }
@@ -547,7 +562,7 @@ void timer(int value)
   cv::flip(im, im, 1);
   cv::cvtColor(im, gray, CV_BGR2GRAY);
 
-   //이미지 track
+  //이미지 track
   std::vector<int> wSize;
   if (failed)
     wSize = wSize2;
@@ -613,7 +628,7 @@ void init()
   // glEnable(GL_DEPTH_TEST);
 }
 
-void keyboard(unsigned char key,int x,int y)
+void keyboard(unsigned char key, int x, int y)
 {
   //ESC 키가 눌러졌다면 프로그램 종료
   if (key == 27)
@@ -645,33 +660,36 @@ int main(int argc, char **argv)
   wSize2[0] = 11;
   wSize2[1] = 9;
   wSize2[2] = 7;
-  
-  model=new FACETRACKER::Tracker(ftFile);
-   cout<<"tracker.cc"<<endl;
+  cout << "start" << endl;
+  model = new FACETRACKER::Tracker(ftFile);
+  cout << "tracker.cc" << endl;
   tri = FACETRACKER::IO::LoadTri(triFile); //검정선 연결
-  cout<<"loadtri.cc"<<endl;
+  cout << "loadtri.cc" << endl;
   con = FACETRACKER::IO::LoadCon(conFile); //파란선 연결
-  
+  cout << "1" << endl;
   //initialize camera and display window
   cv::Mat temp;
 
   camera = cv::VideoCapture(CV_CAP_ANY);
   // camera = new VideoCapture(0);
-  
+  cout << "2" << endl;
 
   if (!camera.isOpened())
   { //카메라가 제대로 연결되지 않았다면 프로그램 종료
     std::cout << "please check your camera!" << std::endl;
     return -1;
   }
-  t0 = cvGetTickCount(); 
-  cout << "3" << endl;
+  t0 = cvGetTickCount();
+
   camera.read(temp);
-  screenW = temp.cols;
-  screenH = temp.rows;
-  cout << "4" << endl;
+    screenW = temp.cols;
+   screenH = temp.rows;
+
+
+
   glutInitWindowSize(screenW, screenH);
-  glutInitWindowPosition(100, 100);
+  //glutInitWindowPosition(100, 100);
+  glutInitWindowPosition(0, 0);
 
   glutCreateWindow("OpenGL");
   init();
@@ -736,13 +754,14 @@ int main(int argc, char **argv)
     text = sss;
     cv::putText(im, text, cv::Point(10, 20), CV_FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(255, 255, 255));
   }
-  cout<<screenW<<" "<<screenH<<endl;
+  cout << screenW << " " << screenH << endl;
   //Random();
   //디스플레이 콜백 함수 등록, display함수는 윈도우 처음 생성할 때와 화면 다시 그릴 필요 있을때 호출된다.
   glutDisplayFunc(display);
   cout << "5" << endl;
   //reshape 콜백 함수 등록, reshape함수는 윈도우 처음 생성할 때와 윈도우 크기 변경시 호출된다.
   glutReshapeFunc(reshape);
+  //gluOrtho2D(-20, temp.cols, temp.rows, -20);
   //타이머 콜백 함수 등록, 처음에는 바로 호출됨.
   cout << "6" << endl;
   glutTimerFunc(0, timer, 0);
