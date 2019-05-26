@@ -92,7 +92,7 @@ float radius = 5.0;
 int num = 45;
 
 float radius1 = 20.0; //벽돌 반지름
-float radius2 = 0.2;  // 이동하는 공의 반지름
+float radius2 = 50;  // 이동하는 공의 반지름
 
 float xp = 40.0;
 float yp = 40.0;
@@ -140,7 +140,7 @@ void Draw_Circle()
 {
   //glClear(GL_COLOR_BUFFER_BIT);
   Color();
-  delta = 2.0 * PI / num;
+  delta = 20.0 * PI / num;
   glBegin(GL_POLYGON);
   for (int i = 0; i < num; i++)
   {
@@ -228,17 +228,19 @@ void RandomMoving()
 
 void CVtoGL(){
 
-  int w=1200;
-  int h=800;
+  int w=640;
+  int h=480;
 
 cout<<endl;
 for(int i=0;i<6;i++)
 {
-  xPts[i]= (float)(pts[i].x - (float)w / 2.0)/100.0;
-  yPts[i]=-(float)(pts[i].y - (float)h / 2.0)/100.0;
+  xPts[i]= (float)(pts[i].x - (float)w / 2.0)*2.0;
+  yPts[i]=-(float)(pts[i].y - (float)h / 2.0)*2.0;
   cout<<xPts[i]<<" "<<yPts[i]<<endl;
 }
 cout<<endl;
+
+
 
 }
 
@@ -310,7 +312,7 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
 //   for(int i=0;i<pts_count;i++)
 //   cout<<pts[i].x<<" "<<pts[i].y<<endl;
 // cout<<endl;
-//CVtoGL();
+  CVtoGL();
   //영역의 크기 구하기
   c = CV_RGB(255, 0, 0);
   cv::fillConvexPoly(image, pts, 6, c);
@@ -542,6 +544,11 @@ void display()
 
   glPointSize(point_size);
   Draw_Circle();
+  glPointSize(10.0);
+  glBegin(GL_POINTS);
+  
+  glVertex2f(xPts[0],yPts[0]);
+  glEnd();
   glPopMatrix();
 
   //glFlush();
