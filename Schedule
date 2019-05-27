@@ -17,10 +17,12 @@
 -코드 정리
 
 #5.19
--중간 발표 준비
--MakeFile update
-server
- - create brunch 'hyex' fro server testing
+- 중간 발표 준비
+- MakeFile update
+- create brunch 'hyex' for server testing
+ 
+#5.23
+- ASW 계정 생성
 
 #5.25
 - 우분투 가상머신 없이 실행 환경 조성
@@ -28,3 +30,7 @@ server
 
 #5.26
 - 입과 도형 인식 이벤트 구현
+
+#5.27
+- AWS server working test (unfinished)
+- RDS connection (success)
