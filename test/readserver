@@ -1,6 +1,6 @@
 #1 Pre-condition
  - (nvm), node js, npm, mysql
- - mysql : database(openSW), table(users)
+ - mysql : database
  - build environment: postman 
 
 #2 create project (structure)
@@ -12,8 +12,12 @@
    then packages in the package.json is installed  
   
 #3 Proceeding
- - register awd account, and create RDS.
- - I will make view using jade or html or node 
+ - register awd account, and create RDS. (complete)
+ - RDS connection (success)
+ - ec2 working test 
+ - sock programming modification
+ - create table (user, score) in RDS ( first !!! )
+
  
  
   
