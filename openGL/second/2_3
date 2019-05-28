@@ -1,0 +1,192 @@
+#include <Windows.h>
+#include <GL\glew.h>
+#include <GL\freeglut.h>
+#include <ctime>
+#include <math.h>
+
+# define PI 3.141592
+
+float width = 780.0;//윈도우 가로
+float height = 600.0;//윈도우 세로
+
+float standard_x = -10.0;
+float standard_y = -10.0;
+
+float radius = 5.0;
+int num = 45;
+
+float radius1 = 20.0; //벽돌 반지름
+float radius2 = 10.0; // 이동하는 공의 반지름
+
+float xp = 40.0;
+float yp = 40.0;
+
+GLfloat cx = 0;
+GLfloat cy = 0; //공의 x,y좌표
+
+GLfloat xstep;
+GLfloat ystep; // 공의 속도
+
+float delta;
+float point_size = 3.0;
+GLenum draw_type;
+
+int a = rand() % 3;
+int b = rand() % 3;
+int c = rand() % 3;
+
+void Random()
+{
+	srand((unsigned int)time(NULL));
+
+	//if (a = 0)//위에서 떨어지는거
+	//{
+		srand((unsigned int)time(NULL));
+		cx = rand() % 741 + 10;
+		cy = -10;
+	//}
+
+	//else if (a = 1)//왼쪽에서 나오는거
+	//{
+	//	srand((unsigned int)time(NULL));
+	//	cx = -30;
+	//	cy = rand() % 561+10;
+	//}
+
+	//else//오른쪽에서 나오는 거
+	//{
+	//	srand((unsigned int)time(NULL));
+	//	cx = 600;
+	//	cy = rand() % 780 + 1;
+	//}
+}
+
+void RandomMoving()
+{
+	srand((unsigned int)time(NULL));
+	int l = rand() % 2;
+
+	srand((unsigned int)time(NULL));
+	xstep = rand() % 1 + 0.3;
+	srand((unsigned int)time(NULL));
+	ystep = rand() % 1 + 0.3;
+
+	//if (a = 0)
+	//{
+		if (l = 0)
+		{
+			cx += xstep;
+			cy += ystep;
+		}
+		else
+		{
+			cx -= xstep;
+			cy += ystep;
+		}
+	/*}
+	else if (a = 1)
+	{
+		if (l = 0)
+		{
+			cx += xstep;
+			cy += ystep;
+		}
+		else
+		{
+			cx += xstep;
+			cy -= ystep;
+		}
+	}
+	else
+	{
+		if (l = 0)
+		{
+			cx -= xstep;
+			cy += ystep;
+		}
+		else
+		{
+			cx -= xstep;
+			cy -= ystep;
+		}
+	}*/
+}
+
+void init() {
+	glClearColor(1.0, 1.0, 1.0, 1.0);
+}
+
+void MyReshape(int w, int h) {
+	glViewport(0, 0, w, h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(-20, width, height, -20);
+}
+
+void Draw_Circle(float x, float y, float r) {
+	delta = 2.0*PI / num;
+	glBegin(GL_POLYGON);
+	for (int i = 0; i < num; i++) {
+		glVertex2f(x + r * cos(delta*i), y + r * sin(delta*i));
+	}
+	glEnd();
+}
+
+void RenderScene(void) {
+	glClear(GL_COLOR_BUFFER_BIT);
+	glPushMatrix();
+
+	float deltaX = xp - cx;
+	float deltaY = yp - cy;
+
+	if (cx + radius2 > standard_x + width + 30) {//오른쪽벽과의 충돌여부
+		//dx *= (-1.0);
+		radius2 = NULL;
+	}
+	if (cx - radius2 < standard_x - 30) {//왼쪽벽
+		//dx *= (-1.0);
+		radius2 = NULL;
+	}
+	if (cy + radius2 > standard_y + height + 30) {//바닥
+		//dy *= (-1.0);
+		radius2 = NULL;
+	}
+	if (cy - radius2 < standard_y - 30) {//천장
+		//dy *= (-1.0);
+		radius2 = NULL;
+	}
+	//cx += dx;
+	//cy += dy; //원이동
+
+	RandomMoving();
+
+	glPointSize(point_size);
+	glColor3f(1, 0, 0);
+	Draw_Circle(cx, cy, radius2);
+	glPopMatrix();
+	glFlush();
+	glutSwapBuffers();
+
+	Draw_Circle(cx, cy, radius2);
+	glutPostRedisplay();
+}
+
+void abc(void) {
+	RenderScene();
+}
+
+int main(int argc, char** argv) {
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+	glutInitWindowSize(780, 600);
+	glutInitWindowPosition(0, 0);
+	glutCreateWindow("Circle Animation");
+	init();
+	Random();
+
+	glutDisplayFunc(RenderScene);
+	glutReshapeFunc(MyReshape);
+
+	glutIdleFunc(abc);
+	glutMainLoop();
+}
