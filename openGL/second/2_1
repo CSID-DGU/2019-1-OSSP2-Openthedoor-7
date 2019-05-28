@@ -1,0 +1,195 @@
+#include <Windows.h>
+#include <GL\glew.h>
+#include <GL\freeglut.h>
+#include <ctime>
+
+//사각형 초기 위치와 크기
+GLfloat x1;
+GLfloat y1;
+GLfloat rsize = 25;
+
+//x와 y방향의 이동속도
+//한번 이동 당 픽셀 수
+GLfloat xstep;
+GLfloat ystep;
+
+//창의 크기 변화를 감시한다
+GLfloat windowWidth;
+GLfloat windowHeight;
+
+//void srand() { srand((unsigned int)time(NULL)); }
+int a = rand() % 3;
+
+void Random()
+{
+	srand((unsigned int)time(NULL));
+	
+	if (a = 0)//위에서 떨어지는거
+	{
+		//srand((unsigned int)time(NULL));
+		x1 = rand() % 200 - 100;
+		y1 = 100.0f;
+	}
+	
+	else if (a = 1)//왼쪽에서 나오는거
+	{
+		//srand((unsigned int)time(NULL));
+		x1 = -100.0f;
+		y1 = rand() % 200 - 100;
+	}
+
+	else//오른쪽에서 나오는 거
+	{
+		//srand((unsigned int)time(NULL));
+		x1 = 100.0f;
+		y1 = rand() % 200 - 100;
+	}
+}
+
+void RandomMoving() 
+{
+	srand((unsigned int)time(NULL));
+	int b = rand() % 2;
+	xstep = rand() % 5 + 1;
+	ystep = rand() % 5 + 1;
+
+	if (a = 0)
+	{
+		if (b = 0)
+		{
+			x1 += xstep;
+			y1 -= ystep;
+		}
+		else
+		{
+			x1 -= xstep;
+			y1 -= ystep;
+		}
+	}
+	else if (a = 1)
+	{
+		if (b = 0)
+		{
+			x1 += xstep;
+			y1 += ystep;
+		}
+		else
+		{
+			x1 += xstep;
+			y1 -= ystep;
+		}
+	}
+	else
+	{
+		if (b = 0)
+		{
+			x1 -= xstep;
+			y1 += ystep;
+		}
+		else
+		{
+			x1 -= xstep;
+			y1 -= ystep;
+		}
+	}
+	
+}
+//장면렌더링시작
+void RenderScene(void)
+{
+	//지정된 색상으로 창의 내용 지움
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	//드로잉 색상을 빨강으로
+	glColor3f(1.0f, 0.0f, 0.0f);
+
+	//현재 드로잉 색상으로 사각형 그림
+	glRectf(x1, y1, x1 + rsize, y1 - rsize);
+
+	//드로잉 명령을 실행하고 버퍼 교체
+	glutSwapBuffers();
+}
+
+void TimerFunction(int value)
+{
+	//왼쪽이나 오른쪽에 부딪히면 사각형 사라짐
+	if (x1 > windowWidth - rsize || x1 < -windowWidth)
+	{
+		rsize = NULL;
+	}
+	if (y1 > windowHeight || y1 < -windowHeight + rsize)
+	{
+		rsize = NULL;
+	}
+
+	RandomMoving();
+
+	//사각형이 경계를 벗어났는지를 검사
+	if (x1 > (windowWidth - rsize + xstep))
+		x1 = windowWidth - rsize - 1;
+	else if(x1 < -(windowWidth+xstep))
+		x1=windowHeight-1;
+
+	if (y1 > (windowHeight + ystep))
+		y1 = windowHeight - 1;
+	else if (y1 < -(windowHeight - rsize + ystep))
+		y1 = -windowHeight + rsize - 1;
+
+	//새로운 좌표로 장면 다시 그림
+	glutPostRedisplay();
+	glutTimerFunc(33, TimerFunction, 1);
+}
+
+//렌더링 상태 설정
+void SetupRC(void)
+{
+	//화면 지우는 색상을 청색으로
+	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+}
+
+//창의 크기 변할때 glut 라이브러리에 의해 호출되는 부분
+void ChangeSize(GLsizei w, GLsizei h)
+{
+	GLfloat aspectRatio;
+
+	//0으로 나누는 것 막음
+	if (h == 0)
+		h = 1;
+
+	//뷰포트 설정
+	glViewport(0, 0, w, h);
+
+	//좌표계 초기화
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	//클리핑 영역 설정
+	aspectRatio = (GLfloat)w / (GLfloat)h;
+	if (w <= h)
+	{
+		windowWidth = 100;
+		windowHeight = 100 / aspectRatio;
+		glOrtho(-100.0, 100.0, -windowHeight, windowHeight, 1.0,- 1.0);
+	}
+	else
+	{
+		windowWidth = 100 * aspectRatio;
+		windowHeight = 100;
+		glOrtho(-windowWidth, windowWidth, -100.0, 100.0, 1.0, -1.0);
+	}
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+}
+
+void main(int argc, char **argv)
+{
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+	glutCreateWindow("Bounce");
+	Random();
+	glutDisplayFunc(RenderScene);
+	glutReshapeFunc(ChangeSize);
+	glutTimerFunc(50, TimerFunction, 1);
+	SetupRC();
+	glutMainLoop();
+}
