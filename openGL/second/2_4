@@ -1,0 +1,237 @@
+#include <Windows.h>
+#include <GL\glew.h>
+#include <GL\freeglut.h>
+#include <ctime>
+#include <math.h>
+
+#define PI 3.141592
+#define randomize() srand((int)time(NULL)) 
+
+float width = 780.0;//윈도우 가로
+float height = 600.0;//윈도우 세로
+
+float standard_x = -10.0;
+float standard_y = -10.0;
+
+float radius = 5.0;
+int num = 45;
+
+float radius1 = 20.0; //벽돌 반지름
+float radius2 = 10.0; // 이동하는 공의 반지름
+
+float xp = 40.0;
+float yp = 40.0;
+
+GLfloat cx;
+GLfloat cy; //공의 x,y좌표
+
+GLfloat xstep;
+GLfloat ystep; // 공의 속도
+
+float delta;
+float point_size = 3.0;
+GLenum draw_type;
+
+GLfloat Red, Green, Blue;  // glColor3f() 파라미터
+GLint ColorIndex;    // 색깔을 결정하는 배열 인덱스
+
+int a = rand() % 3;
+//int b = rand() % 3;
+//int c = rand() % 3;
+
+//9가지 색깔을 9 * 3 배열로 저장한다.
+unsigned char PALETTE[9][3] = {
+ {   0, 255, 255 },  // CYAN
+ {   0, 255,   0 },  // GREEN
+ {   0,   0, 255 },  // BLUE
+ { 255,   0,   0 },  // RED
+ { 255, 190,   0 },  // Orange
+ { 255, 255,   0 },  // YELLOW
+ { 255,   0, 255 },  // PURPLE
+ { 190,   0, 255 },  // Violet
+ {   0,   0,   0 },  // BLACK
+};
+
+//색깔을 초기화 하는 함수
+void Color()
+{
+	Red = PALETTE[ColorIndex][0] / 255.0f;
+	Green = PALETTE[ColorIndex][1] / 255.0f;
+	Blue = PALETTE[ColorIndex][2] / 255.0f;
+	glColor3f(Red, Green, Blue);
+}
+
+
+
+void Draw_Circle() {
+	glClear(GL_COLOR_BUFFER_BIT);
+	Color();
+	delta = 2.0*PI / num;
+	glBegin(GL_POLYGON);
+	for (int i = 0; i < num; i++) {
+		glVertex2f(cx + radius2 * cos(delta*i), cy + radius2 * sin(delta*i));
+	}
+	glEnd();
+}
+
+void MyReshape(int w, int h) {
+	glViewport(0, 0, w, h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(-20, width, height, -20);
+}
+
+void Random()
+{
+	glutDisplayFunc(Draw_Circle);
+
+	srand((unsigned int)time(NULL));
+
+	if (a == 0)//위에서 떨어지는거
+	{
+		srand((unsigned int)time(NULL));
+		cx = rand() % 741 + 10;
+		cy = -10;
+	}
+
+	else if (a == 1)//왼쪽에서 나오는거
+	{
+		srand((unsigned int)time(NULL));
+		cx = -30;
+		cy = rand() % 561 + 10;
+	}
+
+	else//오른쪽에서 나오는 거
+	{
+		srand((unsigned int)time(NULL));
+		cx = 600;
+		cy = rand() % 780 + 1;
+	}
+}
+
+void RandomMoving()
+{
+	srand((unsigned int)time(NULL));
+	int l = rand() % 2;
+
+	srand((unsigned int)time(NULL));
+	xstep = rand() % 5 + 1;
+	srand((unsigned int)time(NULL));
+	ystep = rand() % 5 + 1;
+
+	if (a == 0)
+	{
+		if (l == 0)
+		{
+			cx += xstep;
+			cy += ystep;
+		}
+		else
+		{
+			cx -= xstep;
+			cy += ystep;
+		}
+	}
+	else if (a == 1)
+	{
+		if (l == 0)
+		{
+			cx += xstep;
+			cy += ystep;
+		}
+		else
+		{
+			cx += xstep;
+			cy -= ystep;
+		}
+	}
+	else
+	{
+		if (l == 0)
+		{
+			cx -= xstep;
+			cy += ystep;
+		}
+		else
+		{
+			cx -= xstep;
+			cy -= ystep;
+		}
+	}
+}
+
+void Timer(int value) {
+	glClear(GL_COLOR_BUFFER_BIT);
+	glPushMatrix();
+
+	float deltaX = xp - cx;
+	float deltaY = yp - cy;
+
+	if (cx + radius2 > standard_x + width + 30) {//오른쪽벽과의 충돌여부
+		radius2 = NULL;
+		//reset
+		radius2 = 10.0;
+		if (ColorIndex >= 8) ColorIndex = 0;
+		else    ColorIndex = ColorIndex + 1;
+		Random();
+	}
+
+	if (cx - radius2 < standard_x - 30) {//왼쪽벽
+		radius2 = NULL;
+
+		radius2 = 10.0;
+		if (ColorIndex >= 8) ColorIndex = 0;
+		else    ColorIndex = ColorIndex + 1;
+		Random();
+	}
+
+	if (cy + radius2 > standard_y + height + 30) {//바닥
+		radius2 = NULL;
+
+		radius2 = 10.0;
+		if (ColorIndex >= 8) ColorIndex = 0;
+		else    ColorIndex = ColorIndex + 1;
+		Random();
+	}
+
+	if (cy - radius2 < standard_y - 30) {//천장
+		radius2 = NULL;
+
+		radius2 = 10.0;
+		if (ColorIndex >= 8) ColorIndex = 0;
+		else    ColorIndex = ColorIndex + 1;
+		Random();
+	}
+
+	RandomMoving();
+
+	glPointSize(point_size);
+	Draw_Circle();
+	glPopMatrix();
+	glFlush();
+	glutSwapBuffers();
+
+	glutPostRedisplay();
+	glutTimerFunc(30, Timer, 1);
+}
+
+void init() {
+	glClearColor(1.0, 1.0, 1.0, 1.0);
+}
+
+int main(int argc, char** argv) {
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+	glutInitWindowSize(780, 600);
+	glutInitWindowPosition(0, 0);
+	glutCreateWindow("Circle Animation");
+	init();
+	
+	Random();
+
+	glutReshapeFunc(MyReshape);
+	glutTimerFunc(40, Timer, 1);
+
+	glutMainLoop();
+	return 0;
+}
