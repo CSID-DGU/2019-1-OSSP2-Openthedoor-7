@@ -61,7 +61,7 @@ var server = net.createServer(function(client){
 					user_pw : arr[2]
 				}
 			};
-			let result = await request('http://13.209.29.192:3000/signup',option);
+			let result = await request('http://13.124.167.29:3000/signup',option);
 
 			let data = JSON.parse(result.body).data;
 			console.log('data : ' + data);
@@ -87,7 +87,7 @@ var server = net.createServer(function(client){
 					user_pw : arr[2]
 				}
 			};
-			let result = await request('http://13.209.29.192:3000/signin',option);
+			let result = await request('http://13.124.167.29:3000/signin',option);
 			console.log('result body object : ' + JSON.parse(result.body).user_idx);
 			let data = JSON.parse(result.body).data;
 			if(!result){
@@ -109,7 +109,7 @@ var server = net.createServer(function(client){
 			let option = {
 				method : 'GET',
 			}
-			let url = 'http://13.209.29.192:3000/item/' + parseInt(arr[1]);
+			let url = 'http://13.124.167.29:3000/item/' + parseInt(arr[1]);
 			console.log(url);
 			//let result = await request('http://13.209.29.192:3000/item/'+ arr[1].toString());
 			let result = await request(url,option);
@@ -137,7 +137,7 @@ var server = net.createServer(function(client){
 					item : arr[1]
 				}
 			}
-			let url = 'http://13.209.29.192:3000/item/' + parseInt(arr[2]);
+			let url = 'http://13.124.167.29:3000/item/' + parseInt(arr[2]);
 			let result = await request(url,option);
 			let data = JSON.parse(result.body).data;
 
@@ -161,7 +161,7 @@ var server = net.createServer(function(client){
 			let option = {
 				method : 'GET',
 			}
-			let url = 'http://13.209.29.192:3000/score/' + parseInt(arr[1]);
+			let url = 'http://13.124.167.29:3000/score/' + parseInt(arr[1]);
 			console.log(url);
 			//let result = await request('http://13.209.29.192:3000/item/'+ arr[1].toString());
 			let result = await request(url,option);
@@ -189,7 +189,7 @@ var server = net.createServer(function(client){
 					score : arr[1]
 				}
 			}
-			let url = 'http://13.209.29.192:3000/score/' + parseInt(arr[2]); //arr[2]는 user_idx 정보 
+			let url = 'http://13.124.167.29:3000/score/' + parseInt(arr[2]); //arr[2]는 user_idx 정보 
 			let result = await request(url,option);
 			let data = JSON.parse(result.body).data;
 
@@ -210,7 +210,7 @@ var server = net.createServer(function(client){
 			let option = {
 				method : 'GET',
 			}
-			let scoreUrl = 'http://13.209.29.192:3000/score/' + parseInt(arr[1]);
+			let scoreUrl = 'http://13.124.167.29:3000/score/' + parseInt(arr[1]);
 			let scoreResult = await request(scoreUrl,option);
 
 			if(!scoreResult){
@@ -218,7 +218,7 @@ var server = net.createServer(function(client){
 			} else {
 				// user_idx의 점수 : JSON.parse(result.body).score[0].score.toString()
 				let score = JSON.parse(scoreResult.body).score[0].score.toString();
-				let rankUrl = 'http://13.209.29.192:3000/rank/' + parseInt(score);
+				let rankUrl = 'http://13.124.167.29:3000/rank/' + parseInt(score);
 				let rankResult = await request(rankUrl,option);
 
 				console.log(JSON.parse(rankResult.body).rank);
@@ -239,7 +239,7 @@ var server = net.createServer(function(client){
 				method: 'GET'
 			}
 			console.log('HereHere');
-			let firstUrl = 'http://13.209.29.192:3000/first';
+			let firstUrl = 'http://13.124.167.29:3000/first';
 			let firstResult = await request(firstUrl,option);
 
 			console.log(JSON.parse(firstResult.body).first);
