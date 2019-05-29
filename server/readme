@@ -1,1 +1,10 @@
-hello
+< not exist >
+node_modules
+dbPool.js
+pakage_lock.json
+
+< how to start >
+1. download all files
+2. find this folder and enter
+3. npm install ( then install node_modules )
+4. request hyex or sohui dbPool.js & pakage_lock.json
