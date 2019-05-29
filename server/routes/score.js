@@ -14,7 +14,7 @@ router.get('/:user_idx', async (req,res) => {
             message : "Not Index Number"
         });
     } else {
-        let checkQuery = "SELECT tetris_info.board.score FROM tetris_info.board WHERE user_idx= ?";
+        let checkQuery = "SELECT user.score FROM openthedoor.user WHERE user_idx= ?";
         let checkResult = await db.queryParam_Arr(checkQuery,[user_idx]);
 
         if(!checkResult){
@@ -49,7 +49,7 @@ router.put('/:user_idx', async (req,res) => {
             message : "Not Index Number"
         });
     } else {
-        let updateQuery = "UPDATE tetris_info.board SET score = ? WHERE user_idx= ?";
+        let updateQuery = "UPDATE openthedoor.user SET score = ? WHERE user_idx= ?";
         let updateResult = await db.queryParam_Arr(updateQuery, [score, user_idx]);
 
         if (!updateResult) {                                        // 정상적으로 query문이 수행되지 않았을 경우

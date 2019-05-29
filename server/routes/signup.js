@@ -34,7 +34,7 @@ router.post('/', async (req, res) => {
 			let insertUserQuery = 'INSERT INTO openthedoor.user (user_id, user_pw, user_salt) VALUES (?, ?, ?)';
 			let insertUserResult = await db.queryParam_Arr(insertUserQuery, [user_id, hashedpwd.toString('base64'), salt.toString('base64')]);
 			console.log('result의 객체 : ' + insertUserResult.insertId);
-
+			
 			if (!insertUserResult ) {										// 정상적으로 query문이 수행되지 않았을 경우
 				res.status(500).send({
 					message : "Internal Server Error"

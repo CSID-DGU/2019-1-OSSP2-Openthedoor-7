@@ -31,7 +31,7 @@ router.post('/', async (req, res) => {
 	      });
 	    } else {
 	      res.status(400).send({
-	        message : "Login Failed"						// 클라이언트에게는 login에러라고만 보내줌
+	        message : "Login Failed" 					// 클라이언트에게는 login에러라고만 보내줌
 	      });
 	      console.log("pwd error");							// 콘솔창에는 어떤 에러인지 표시
 	    }
