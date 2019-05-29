@@ -80,8 +80,8 @@ cv::Mat frame, gray;
 
 cv::Mat temp;
 //camera.read(temp);
-float width = temp.cols;  //윈도우 가로
-float height = temp.rows; //윈도우 세로
+float width = 640;  //윈도우 가로
+float height = 480; //윈도우 세로
 /* float width = 780;//윈도우 가로
 float height = 600; */
 
@@ -92,13 +92,13 @@ float radius = 5.0;
 int num = 45;
 
 float radius1 = 20.0; //벽돌 반지름
-float radius2 = 50;  // 이동하는 공의 반지름
+float radius2 = 25.0; // 이동하는 공의 반지름
 
 float xp = 40.0;
 float yp = 40.0;
 
-GLfloat cx;
-GLfloat cy; //공의 x,y좌표
+GLfloat cx = -400;
+GLfloat cy = 505; //공의 x,y좌표
 
 GLfloat xstep;
 GLfloat ystep; // 공의 속도
@@ -110,23 +110,17 @@ GLenum draw_type;
 GLfloat Red, Green, Blue; // glColor3f() 파라미터
 GLint ColorIndex;         // 색깔을 결정하는 배열 인덱스
 
-int a = rand() % 3;
-//int b = rand() % 3;
-//int c = rand() % 3;
-
-//9가지 색깔을 9 * 3 배열로 저장한다.
 unsigned char PALETTE[9][3] = {
-    {0, 255, 255}, // CYAN
-    {0, 255, 0},   // GREEN
-    {0, 0, 255},   // BLUE
-    {255, 0, 0},   // RED
-    {255, 190, 0}, // Orange
-    {255, 255, 0}, // YELLOW
-    {255, 0, 255}, // PURPLE
-    {190, 0, 255}, // Violet
-    {0, 0, 0},     // BLACK
+    {255, 204, 255}, // FFCCFF
+    {255, 255, 51},  // FFFF33
+    {204, 255, 255}, // CCFFFF
+    {255, 51, 153},  // FF3399
+    {255, 255, 204}, //
+    {204, 204, 204}, // YELLOW
+    {255, 51, 0},    // PURPLE
+    {190, 0, 255},   // Violet
+    {204, 51, 255},  // BLACK
 };
-
 //색깔을 초기화 하는 함수
 void Color()
 {
@@ -136,11 +130,18 @@ void Color()
   glColor3f(Red, Green, Blue);
 }
 
+int aSelect()
+{
+  srand((unsigned int)time(NULL));
+  int a = rand() % 3;
+  return a;
+}
+
 void Draw_Circle()
 {
   //glClear(GL_COLOR_BUFFER_BIT);
   Color();
-  delta = 20.0 * PI / num;
+  delta = 2.0 * PI / num;
   glBegin(GL_POLYGON);
   for (int i = 0; i < num; i++)
   {
@@ -149,53 +150,54 @@ void Draw_Circle()
   glEnd();
 }
 
-void Random()
+void Random(int a)
 {
+  //Draw_Circle();
   if (a == 0) //위에서 떨어지는거
   {
     srand((unsigned int)time(NULL));
-    cx = rand() % 13 - 6;
-    cy = 4.2;
+    cx = rand() % 1231 - 615;
+    cy = 505;
   }
 
   else if (a == 1) //왼쪽에서 나오는거
   {
     srand((unsigned int)time(NULL));
-    cx = -6.2;
-    cy = rand() % 9 - 4;
+    cx = -665;
+    cy = rand() % 911 - 455;
   }
 
   else //오른쪽에서 나오는 거
   {
     srand((unsigned int)time(NULL));
-    cx = 6.2;
-    cy = rand() % 9 - 4;
+    cx = 665;
+    cy = rand() % 911 - 455;
   }
 
   Draw_Circle();
 }
 
-void RandomMoving()
+void RandomMoving(int a)
 {
   srand((unsigned int)time(NULL));
   int l = rand() % 2;
 
   srand((unsigned int)time(NULL));
-  xstep = rand() % 1 + 0.4;
+  xstep = rand() % 15 + 5;
   srand((unsigned int)time(NULL));
-  ystep = rand() % 1 + 0.4;
+  ystep = rand() % 15 + 5;
 
   if (a == 0)
   {
     if (l == 0)
     {
       cx += xstep;
-      cy += ystep;
+      cy -= ystep;
     }
     else
     {
       cx -= xstep;
-      cy += ystep;
+      cy -= ystep;
     }
   }
   else if (a == 1)
@@ -226,22 +228,20 @@ void RandomMoving()
   }
 }
 
-void CVtoGL(){
-
-  int w=640;
-  int h=480;
-
-cout<<endl;
-for(int i=0;i<6;i++)
+void CVtoGL()
 {
-  xPts[i]= (float)(pts[i].x - (float)w / 2.0)*2.0;
-  yPts[i]=-(float)(pts[i].y - (float)h / 2.0)*2.0;
-  cout<<xPts[i]<<" "<<yPts[i]<<endl;
-}
-cout<<endl;
 
+  int w = 640;
+  int h = 480;
 
-
+  //cout << endl;
+  for (int i = 0; i < 6; i++)
+  {
+    xPts[i] = (float)(pts[i].x - (float)w / 2.0) * 2.0;
+    yPts[i] = -(float)(pts[i].y - (float)h / 2.0) * 2.0;
+    //cout << xPts[i] << " " << yPts[i] << endl;
+  }
+  //cout << endl;
 }
 
 //=============================================================================
@@ -308,10 +308,6 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
     }
   }
 
-// cout<<endl;
-//   for(int i=0;i<pts_count;i++)
-//   cout<<pts[i].x<<" "<<pts[i].y<<endl;
-// cout<<endl;
   CVtoGL();
   //영역의 크기 구하기
   c = CV_RGB(255, 0, 0);
@@ -455,9 +451,8 @@ GLuint MatToTexture(Mat image)
 
 void draw_background()
 {
-   int x = screenW ;
-   int y = screenH ;
-
+  int x = screenW;
+  int y = screenH;
 
   glBegin(GL_QUADS);
   glTexCoord2f(0.0, 1.0);
@@ -470,7 +465,6 @@ void draw_background()
   glVertex3f(-x, y, 0.0);
   glEnd();
 }
-
 
 void display()
 {
@@ -492,66 +486,75 @@ void display()
   float deltaX = xp - cx;
   float deltaY = yp - cy;
 
-  if (cx + radius2 > 6.4)
+  int a = aSelect();
+  glBegin(GL_QUADS);
+  glVertex2f(xPts[0], yPts[0]);
+  glVertex2f(xPts[2], yPts[2]);
+  glVertex2f(xPts[3], yPts[3]);
+  glVertex2f(xPts[5], yPts[5]);
+  glEnd();
+  glFinish();
+
+
+  if (xPts[0] < cx && xPts[2] > cx && cy < yPts[2] && cy > yPts[3])
+  {
+    cout<<"입안에 들어와따"<<endl;
+    radius2 = 0;
+  }
+  
+  if (cx + radius2 > 690)
   {                 //오른쪽벽과의 충돌여부
     radius2 = NULL; //충돌했다면 종료하고 새로 호출
     //reset
-    radius2 = 0.2;
+    radius2 = 25.0;
     if (ColorIndex >= 8)
       ColorIndex = 0;
     else
       ColorIndex = ColorIndex + 1;
-    Random();
+    Random(a);
   }
 
-  if (cx - radius2 < -6.4)
+  if (cx - radius2 < -690)
   { //왼쪽벽
     radius2 = NULL;
 
-    radius2 = 0.2;
+    radius2 = 25.0;
     if (ColorIndex >= 8)
       ColorIndex = 0;
     else
       ColorIndex = ColorIndex + 1;
-    Random();
+    Random(a);
   }
 
-  if (cy + radius2 < -4.4)
+  if (cy - radius2 < -530)
   { //바닥
     radius2 = NULL;
 
-    radius2 = 0.2;
+    radius2 = 25.0;
     if (ColorIndex >= 8)
       ColorIndex = 0;
     else
       ColorIndex = ColorIndex + 1;
-    Random();
+    Random(a);
   }
 
-  if (cy - radius2 > 4.4)
+  if (cy + radius2 > 530)
   { //천장
     radius2 = NULL;
 
-    radius2 = 0.2;
+    radius2 = 25.0;
     if (ColorIndex >= 8)
       ColorIndex = 0;
     else
       ColorIndex = ColorIndex + 1;
-    Random();
+    Random(a);
   }
 
-  RandomMoving();
+  RandomMoving(a);
 
-  glPointSize(point_size);
   Draw_Circle();
-  glPointSize(10.0);
-  glBegin(GL_POINTS);
-  
-  glVertex2f(xPts[0],yPts[0]);
-  glEnd();
-  glPopMatrix();
 
-  //glFlush();
+  glPopMatrix();
   glutSwapBuffers();
 }
 
@@ -709,10 +712,8 @@ int main(int argc, char **argv)
   t0 = cvGetTickCount();
 
   camera.read(temp);
-    screenW = temp.cols;
-   screenH = temp.rows;
-
-  
+  screenW = temp.cols;
+  screenH = temp.rows;
 
   glutInitWindowSize(screenW, screenH);
   //glutInitWindowPosition(100, 100);
