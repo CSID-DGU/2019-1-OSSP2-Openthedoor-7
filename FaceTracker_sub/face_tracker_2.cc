@@ -164,6 +164,14 @@ void Draw_Circle()
   }
   glEnd();
 }
+void Draw_Rect()
+{
+
+}
+void Draw_Tri()
+{
+
+}
 
 void Random(int a)
 {
