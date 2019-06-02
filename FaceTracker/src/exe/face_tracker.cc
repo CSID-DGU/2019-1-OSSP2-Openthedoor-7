@@ -53,10 +53,11 @@ int screenW;
 int screenH;
 
 int score = 0;
-int life=3;
-string nowLife="LIFE : ♥♥♡♡";
+int life = 3;
+string nowLife = "LIFE : ♥♥♡♡";
 
 cv::Point pts[6];
+Point redFace[27];
 float xPts[6];
 float yPts[6];
 
@@ -168,8 +169,8 @@ void Random(int a)
 void RandomMoving(int a)
 {
 
-GLfloat xstep;
-GLfloat ystep; // 공의 속도
+  GLfloat xstep;
+  GLfloat ystep; // 공의 속도
 
   srand((unsigned int)time(NULL));
   int l = rand() % 2;
@@ -243,9 +244,8 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
   int i, n = shape.rows / 2;
   cv::Point p1, p2;
   cv::Scalar c;
-
   int pts_count = 0;
-  int mouth_cnt = 0;
+  int face_cnt = 0;
   //draw triangulation
   c = CV_RGB(0, 0, 0); //검정선
   for (i = 0; i < tri.rows; i++)
@@ -292,6 +292,12 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
     c = CV_RGB(255, 0, 0); //빨간 원
     cv::circle(image, p1, 2, c);
     //cv::putText(image,std::to_string(i),p1,CV_FONT_HERSHEY_COMPLEX,0.5,c); //인덱싱
+
+    if (i <= 26)
+    {
+      redFace[face_cnt++] = p1;
+    }
+
     if (i == 60 || i == 61 || i == 62 || i == 63 || i == 64 || i == 65)
     {
       pts[pts_count++] = p1;
@@ -304,7 +310,6 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
   //영역의 크기 구하기
   c = CV_RGB(255, 0, 0);
   cv::fillConvexPoly(image, pts, 6, c);
-
   return;
 }
 //=============================================================================
@@ -458,21 +463,34 @@ void draw_background()
   glEnd();
 }
 
-void desLife(){
+void desLife()
+{
+
+  cv::Scalar cc(0, 0, 255);
+  Mat copy;
+  double alpha = 0.5;
 
   life--;
-  if(life==0){
+  if (life == 0)
+  {
 
-    //빨간얼굴출력
-    sleep(1000); 
+    image.copyTo(copy);
+    fillConvexPoly(copy, redFace, 27, cc);
+    addWeighted(copy, alpha, image, 1 - alpha, 0, image);
+    //sleep(1000);
     exit(0);
-  
-  }else if(life==1){
-     nowLife="❤♡♡";
-  }else if(life==2){
-     nowLife="❤❤♡";
-  }else if(life==3){
-    nowLife="❤❤❤";
+  }
+  else if (life == 1)
+  {
+    nowLife = "❤♡♡";
+  }
+  else if (life == 2)
+  {
+    nowLife = "❤❤♡";
+  }
+  else if (life == 3)
+  {
+    nowLife = "❤❤❤";
   }
 }
 
@@ -505,8 +523,7 @@ void display()
   // glEnd();
   // glFinish();
 
-
-  if (xPts[0] < cx && xPts[2] > cx && cy < yPts[2] && cy > yPts[3])//입안에 들어왔을 때
+  if (xPts[0] < cx && xPts[2] > cx && cy < yPts[2] && cy > yPts[3]) //입안에 들어왔을 때
   {
     radius2 = 0;
     score++;
@@ -516,7 +533,7 @@ void display()
   // {
   //   desLife();
   // }
-  
+
   if (cx + radius2 > 690)
   {                 //오른쪽벽과의 충돌여부
     radius2 = NULL; //충돌했다면 종료하고 새로 호출
@@ -580,23 +597,23 @@ void reshape(GLsizei width, GLsizei height)
   glMatrixMode(GL_PROJECTION);                       //이후 연산은 Projection Matrix에 영향을 준다.
   glLoadIdentity();
   gluOrtho2D(-640, 640, -480, 480);
-
 }
 
-void faceCam(){
+void faceCam()
+{
 
-string text,dynamic_score;
-char sss[256];
-char vvv[256];
-char ooo[256];
-double fps = 0;
-int fnum = 0;
-Mat frame, gray;
-bool show = true;
-bool failed = true;
-double clamp = 3, fTol = 0.01;
+  string text, dynamic_score;
+  char sss[256];
+  char vvv[256];
+  char ooo[256];
+  double fps = 0;
+  int fnum = 0;
+  Mat frame, gray;
+  bool show = true;
+  bool failed = true;
+  double clamp = 3, fTol = 0.01;
 
- camera.read(frame); //frame 변수에 카메라 읽어온 값을 넣음
+  camera.read(frame); //frame 변수에 카메라 읽어온 값을 넣음
 
   if (scale == 1)
   {
@@ -645,16 +662,14 @@ double clamp = 3, fTol = 0.01;
   {
     sprintf(sss, "%d frames/sec", (int)round(fps));
     text = sss;
-    sprintf(vvv,"SCORE : %d",score);
-    dynamic_score=vvv;
-    sprintf(ooo,"LIFE : %d",life);
-    nowLife=ooo;
+    sprintf(vvv, "SCORE : %d", score);
+    dynamic_score = vvv;
+    sprintf(ooo, "LIFE : %d", life);
+    nowLife = ooo;
     putText(im, text, cv::Point(10, 20), CV_FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(255, 255, 255));
-    putText(im, dynamic_score, cv::Point(450, 30), CV_FONT_HERSHEY_SIMPLEX, 1.0, CV_RGB(0,0, 0),2);
-    putText(im,nowLife, cv::Point(500, 470), CV_FONT_HERSHEY_SIMPLEX, 1.0, CV_RGB(0,0, 0),2);
-    
+    putText(im, dynamic_score, cv::Point(450, 30), CV_FONT_HERSHEY_SIMPLEX, 1.0, CV_RGB(0, 0, 0), 2);
+    putText(im, nowLife, cv::Point(500, 470), CV_FONT_HERSHEY_SIMPLEX, 1.0, CV_RGB(0, 0, 0), 2);
   }
-
 }
 void timer(int value)
 {
@@ -672,7 +687,6 @@ void init()
 
   //화면 지울때 사용할 색 지정
   glClearColor(0.0, 0.0, 0.0, 0.0);
-
 }
 
 void keyboard(unsigned char key, int x, int y)
@@ -707,11 +721,11 @@ int main(int argc, char **argv)
   wSize2[0] = 11;
   wSize2[1] = 9;
   wSize2[2] = 7;
- 
+
   model = new FACETRACKER::Tracker(ftFile);
   tri = FACETRACKER::IO::LoadTri(triFile); //검정선 연결
   con = FACETRACKER::IO::LoadCon(conFile); //파란선 연결
-  
+
   //initialize camera and display window
   cv::Mat temp;
 
