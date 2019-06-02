@@ -39,4 +39,6 @@
 - 도형이 입에 닿으면 사라지는 이벤트 구현
 - EC2 server peristalsis complete :)
 
-
+#6.2
+- 점수 체계 도입
+- 코드 함수화, 정리
