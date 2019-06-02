@@ -53,6 +53,9 @@ int screenW;
 int screenH;
 
 int score = 0;
+int life=3;
+string nowLife="LIFE : ♥♥♡♡";
+
 cv::Point pts[6];
 float xPts[6];
 float yPts[6];
@@ -60,23 +63,17 @@ float yPts[6];
 Mat im, tri, con;
 cv::VideoCapture camera;
 FACETRACKER::Tracker *model;
-GLuint texture_background, texture_cube;
-float cubeAngle = 0;
+int64 t1, t0; //framerate 출력을 위한 변수
+
+GLuint texture_background;
+
 std::vector<int> wSize1(1);
 std::vector<int> wSize2(3);
+
 int nIter = 5;
-double clamp = 3, fTol = 0.01;
 bool fcheck = false;
 double scale = 1;
 int fpd = -1;
-bool show = true;
-bool failed = true;
-char sss[256];
-double fps = 0;
-std::string text;
-int64 t1, t0; //framerate 출력을 위한 변수
-int fnum = 0;
-cv::Mat frame, gray;
 
 cv::Mat temp;
 //camera.read(temp);
@@ -466,9 +463,23 @@ void draw_background()
   glEnd();
 }
 
+void desLife(){
+
+  life--;
+  if(life==0){
+    exit(0);
+  }else if(life==1){
+     nowLife="❤♡♡";
+  }else if(life==2){
+     nowLife="❤❤♡";
+  }else if(life==3){
+    nowLife="❤❤❤";
+  }
+}
+
 void display()
 {
-  //화면을 지운다. (컬러버퍼와 깊이버퍼)
+
   glClear(GL_COLOR_BUFFER_BIT);
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // background color
 
@@ -496,11 +507,16 @@ void display()
   glFinish();
 
 
-  if (xPts[0] < cx && xPts[2] > cx && cy < yPts[2] && cy > yPts[3])
+  if (xPts[0] < cx && xPts[2] > cx && cy < yPts[2] && cy > yPts[3])//입안에 들어왔을 때
   {
-    cout<<"입안에 들어와따"<<endl;
     radius2 = 0;
+    score++;
   }
+
+  // if()//세모를 먹었을 때
+  // {
+  //   desLife();
+  // }
   
   if (cx + radius2 > 690)
   {                 //오른쪽벽과의 충돌여부
@@ -564,22 +580,24 @@ void reshape(GLsizei width, GLsizei height)
   glViewport(0, 0, (GLsizei)width, (GLsizei)height); //윈도우 크기로 뷰포인트 설정
   glMatrixMode(GL_PROJECTION);                       //이후 연산은 Projection Matrix에 영향을 준다.
   glLoadIdentity();
-
-  //Field of view angle(단위 degrees), 윈도우의 aspect ratio, Near와 Far Plane설정
-  // gluPerspective(45, (GLfloat)width / (GLfloat)height, 1.0, 100.0);
-
-  // glMatrixMode(GL_MODELVIEW); //이후 연산은 ModelView Matirx에 영향을 준다.
-  //gluOrtho2D(0, 12, 0, 8);
   gluOrtho2D(-640, 640, -480, 480);
-  //gluOrtho2D(-6, width / 100, -4, height / 100);
+
 }
 
-void timer(int value)
-{
-  //웹캠으로부터 이미지 캡처
+void faceCam(){
 
-  //grab image, resize and flip
-  camera.read(frame); //frame 변수에 카메라 읽어온 값을 넣음
+string text,dynamic_score;
+char sss[256];
+char vvv[256];
+char ooo[256];
+double fps = 0;
+int fnum = 0;
+Mat frame, gray;
+bool show = true;
+bool failed = true;
+double clamp = 3, fTol = 0.01;
+
+ camera.read(frame); //frame 변수에 카메라 읽어온 값을 넣음
 
   if (scale == 1)
   {
@@ -593,7 +611,7 @@ void timer(int value)
   cv::cvtColor(im, gray, CV_BGR2GRAY);
 
   //이미지 track
-  std::vector<int> wSize;
+  vector<int> wSize;
   if (failed)
     wSize = wSize2;
   else
@@ -608,8 +626,8 @@ void timer(int value)
   {
     if (show)
     {
-      cv::Mat R(im, cvRect(0, 0, 150, 50));
-      R = cv::Scalar(0, 0, 255);
+      Mat R(im, cvRect(0, 0, 150, 50));
+      R = Scalar(0, 0, 255);
     }
     model->FrameReset();
     failed = true;
@@ -628,17 +646,22 @@ void timer(int value)
   {
     sprintf(sss, "%d frames/sec", (int)round(fps));
     text = sss;
-    cv::putText(im, text, cv::Point(10, 20), CV_FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(255, 255, 255));
+    sprintf(vvv,"SCORE : %d",score);
+    dynamic_score=vvv;
+    sprintf(ooo,"LIFE : %d",life);
+    nowLife=ooo;
+    putText(im, text, cv::Point(10, 20), CV_FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(255, 255, 255));
+    putText(im, dynamic_score, cv::Point(450, 30), CV_FONT_HERSHEY_SIMPLEX, 1.0, CV_RGB(0,0, 0),2);
+    putText(im,nowLife, cv::Point(500, 470), CV_FONT_HERSHEY_SIMPLEX, 1.0, CV_RGB(0,0, 0),2);
+    
   }
 
-  //capture->read(img_cam);
+}
+void timer(int value)
+{
+  faceCam();
+
   cvtColor(im, im, COLOR_BGR2RGB);
-
-  cubeAngle += 1.0f;
-  if (cubeAngle > 360)
-  {
-    cubeAngle -= 360;
-  }
 
   glutPostRedisplay();        //윈도우를 다시 그리도록 요청
   glutTimerFunc(1, timer, 0); //다음 타이머 이벤트는 1밀리세컨트 후  호출됨.
@@ -651,11 +674,6 @@ void init()
   //화면 지울때 사용할 색 지정
   glClearColor(0.0, 0.0, 0.0, 0.0);
 
-  //깊이 버퍼 지울 때 사용할 값 지정
-  // glClearDepth(1.0);
-
-  // //깊이 버퍼 활성화
-  // glEnable(GL_DEPTH_TEST);
 }
 
 void keyboard(unsigned char key, int x, int y)
@@ -690,19 +708,16 @@ int main(int argc, char **argv)
   wSize2[0] = 11;
   wSize2[1] = 9;
   wSize2[2] = 7;
-  cout << "start" << endl;
+ 
   model = new FACETRACKER::Tracker(ftFile);
-  cout << "tracker.cc" << endl;
   tri = FACETRACKER::IO::LoadTri(triFile); //검정선 연결
-  cout << "loadtri.cc" << endl;
   con = FACETRACKER::IO::LoadCon(conFile); //파란선 연결
-  cout << "1" << endl;
+  
   //initialize camera and display window
   cv::Mat temp;
 
   camera = cv::VideoCapture(CV_CAP_ANY);
   // camera = new VideoCapture(0);
-  cout << "2" << endl;
 
   if (!camera.isOpened())
   { //카메라가 제대로 연결되지 않았다면 프로그램 종료
@@ -722,66 +737,12 @@ int main(int argc, char **argv)
   glutCreateWindow("OpenGL");
   init();
 
-  //cvNamedWindow("Face Tracker",1); // 윈도우 창 생성
   std::cout << "Hot keys: " << std::endl
             << "\t ESC - quit" << std::endl
             << "\t d   - Redetect" << std::endl;
 
-  //ESC 입력까지 무한 루프
-  //-----------------------------------WHILE(1)
-  //show image and check for user input
-  camera.read(frame); //frame 변수에 카메라 읽어온 값을 넣음
-  //glutCreateWindow("OpenGL");
+  faceCam();
 
-  if (scale == 1)
-  {
-    im = frame;
-  }
-  else
-  {
-    cv::resize(frame, im, cv::Size(scale * frame.cols, scale * frame.rows));
-  }
-  cv::flip(im, im, 1);
-  cv::cvtColor(im, gray, CV_BGR2GRAY);
-
-  //이미지 track
-  std::vector<int> wSize;
-  if (failed)
-    wSize = wSize2;
-  else
-    wSize = wSize1;
-  if (model->Track(gray, wSize, fpd, nIter, clamp, fTol, fcheck) == 0)
-  {
-    int idx = model->_clm.GetViewIdx();
-    failed = false;
-    Draw(im, model->_shape, con, tri, model->_clm._visi[idx]); //im에 선과 점을 그림
-  }
-  else
-  {
-    if (show)
-    {
-      cv::Mat R(im, cvRect(0, 0, 150, 50));
-      R = cv::Scalar(0, 0, 255);
-    }
-    model->FrameReset();
-    failed = true;
-  }
-  //FRAMERATE를 화면에 출력
-  if (fnum >= 9)
-  {
-    t1 = cvGetTickCount();
-    fps = 10.0 / ((double(t1 - t0) / cvGetTickFrequency()) / 1e+6);
-    t0 = t1;
-    fnum = 0;
-  }
-  else
-    fnum += 1;
-  if (show)
-  {
-    sprintf(sss, "%d frames/sec", (int)round(fps));
-    text = sss;
-    cv::putText(im, text, cv::Point(10, 20), CV_FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(255, 255, 255));
-  }
   cout << screenW << " " << screenH << endl;
   //Random();
   //디스플레이 콜백 함수 등록, display함수는 윈도우 처음 생성할 때와 화면 다시 그릴 필요 있을때 호출된다.
