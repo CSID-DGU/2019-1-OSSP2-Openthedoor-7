@@ -6,7 +6,8 @@ FaceTracker
 https://github.com/kylemcdonald/FaceTracker  
 OpenCV
 https://github.com/opencv/opencv  
-OpenGL  
+OpenGL
+https://www.opengl.org/
 
 
 # 개발 환경
