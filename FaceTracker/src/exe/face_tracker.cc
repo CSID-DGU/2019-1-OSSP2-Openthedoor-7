@@ -82,13 +82,6 @@ float height = 480; //윈도우 세로
 /* float width = 780;//윈도우 가로
 float height = 600; */
 
-float standard_x = -10.0;
-float standard_y = -10.0;
-
-float radius = 5.0;
-int num = 45;
-
-float radius1 = 20.0; //벽돌 반지름
 float radius2 = 25.0; // 이동하는 공의 반지름
 
 float xp = 40.0;
@@ -97,10 +90,6 @@ float yp = 40.0;
 GLfloat cx = -400;
 GLfloat cy = 505; //공의 x,y좌표
 
-GLfloat xstep;
-GLfloat ystep; // 공의 속도
-
-float delta;
 float point_size = 3.0;
 GLenum draw_type;
 
@@ -136,6 +125,8 @@ int aSelect()
 
 void Draw_Circle()
 {
+  int num = 45;
+  float delta;
   //glClear(GL_COLOR_BUFFER_BIT);
   Color();
   delta = 2.0 * PI / num;
@@ -176,6 +167,10 @@ void Random(int a)
 
 void RandomMoving(int a)
 {
+
+GLfloat xstep;
+GLfloat ystep; // 공의 속도
+
   srand((unsigned int)time(NULL));
   int l = rand() % 2;
 
@@ -467,7 +462,11 @@ void desLife(){
 
   life--;
   if(life==0){
+
+    //빨간얼굴출력
+    sleep(1000); 
     exit(0);
+  
   }else if(life==1){
      nowLife="❤♡♡";
   }else if(life==2){
@@ -498,13 +497,13 @@ void display()
   float deltaY = yp - cy;
 
   int a = aSelect();
-  glBegin(GL_QUADS);
-  glVertex2f(xPts[0], yPts[0]);
-  glVertex2f(xPts[2], yPts[2]);
-  glVertex2f(xPts[3], yPts[3]);
-  glVertex2f(xPts[5], yPts[5]);
-  glEnd();
-  glFinish();
+  // glBegin(GL_QUADS);
+  // glVertex2f(xPts[0], yPts[0]);
+  // glVertex2f(xPts[2], yPts[2]);
+  // glVertex2f(xPts[3], yPts[3]);
+  // glVertex2f(xPts[5], yPts[5]);
+  // glEnd();
+  // glFinish();
 
 
   if (xPts[0] < cx && xPts[2] > cx && cy < yPts[2] && cy > yPts[3])//입안에 들어왔을 때
