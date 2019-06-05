@@ -97,6 +97,9 @@ float radiusIT = 25.0;
 float xp = 40.0;
 float yp = 40.0;
 
+GLfloat xstep;
+GLfloat ystep; // 공의 속도
+
 GLfloat cx=-400;
 GLfloat cy=505;
 
@@ -157,8 +160,9 @@ void draw_life(){
 
   }else if(life==3){
 
-      int max = 1100;
-    int y = -420;
+     glColor3f(1.0, 0.0, 0.0);
+    int max = 1200;
+    int y = -430;
     glBegin(GL_POLYGON);
     glVertex2i(max / 2, y);             //1
     glVertex2i((max / 2) - 10, y + 10); //2
@@ -171,7 +175,7 @@ void draw_life(){
     glVertex2i((max / 2) + 30, y + 10); //9
     glVertex2i((max / 2) + 10, y + 10); //10
     glEnd();
-    max = 900;
+    max = 1000;
     glBegin(GL_POLYGON);
     glVertex2i(max / 2, y);             //1
     glVertex2i((max / 2) - 10, y + 10); //2
@@ -184,7 +188,7 @@ void draw_life(){
     glVertex2i((max / 2) + 30, y + 10); //9
     glVertex2i((max / 2) + 10, y + 10); //10
     glEnd();
-    max = 700;
+    max = 800;
     glBegin(GL_POLYGON);
     glVertex2i(max / 2, y);             //1
     glVertex2i((max / 2) - 10, y + 10); //2
@@ -455,98 +459,8 @@ void inTriRandom(int a, int l)
    Draw_inTri();
 }
 
-void Random(int a, int l)
-{
-  srand((unsigned int)time(NULL));
-  //int l=rand() % 2;
-  //Draw_Circle();
-   if (a == 0)//원:위/ 네모:왼쪽/세모:오른쪽
-   {
-      srand((unsigned int)time(NULL));
-      rx=-690;
-      tx=665;
-      if(l=0)//왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
-      {
-        cx=rand()%616-615;
-        ry=rand()%431-430;
-        //ry=rand()%406+25;
-        ty=rand()%431+50;
-        itx=rand()%491+50;
-      }
-      else//오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
-      {
-        cx=rand()%615+1;
-        ry=rand()%406+25;
-        //ry=rand()%431-430;
-        ty=rand()%431-430;
-        itx=rand()%541-540;
-      }
-      cy = 505;
-      ity=480;
-   }
-
-   else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
-   {
-      srand((unsigned int)time(NULL));
-      cx = -665;
-      rx=640;
-      if(l=0)//원:위 / 네모:아래
-      {
-        cy=rand()%456-455;
-        ry=rand()%431-430;
-        //ry=rand()%406+25;
-        tx=rand()%566-590;
-        itx=rand()%491+50;
-      }
-      else//원:아래 / 네모:위
-      {
-        cy=rand()%455+1;
-        ry=rand()%406+25;
-        //ry=rand()%431-430;
-        tx=rand()%591;
-        itx=rand()%541-540;
-      }
-      ty=530;
-      ity=480;
-   }
-
-   else//원:오른쪽 / 네모:위 / 세모:왼쪽
-   {
-      srand((unsigned int)time(NULL));
-      cx = 665;
-      tx=-665;
-      if(l=0)//위쪽 or 왼쪽
-      {
-        cy=rand()%456-455;
-        ry=rand()%591-615;
-        ty=rand()%431+50;
-        itx=rand()%491+50;
-      }
-      else//아래쪽 or 오른쪽
-      {
-        cy=rand()%455+1;
-        ry=rand()%566;
-        ty=rand()%431-430;
-        itx=rand()%541-540;
-      }
-      ry=530;
-      ity=480;
-   }
-   
-   Draw_Circle();
-   Draw_Rect();
-   Draw_Tri();
-   Draw_inTri();
-}
-
-void RandomMoving(int a, int l)
-{
-  GLfloat xstep;
-  GLfloat ystep; // 공의 속도
-  
-  srand((unsigned int)time(NULL));
-  //int l = rand() % 2;
-
+void circleRandomMoving(int a, int l)
+{  
   srand((unsigned int)time(NULL));
   xstep = rand() % 20 + 10;
   srand((unsigned int)time(NULL));
@@ -558,27 +472,11 @@ void RandomMoving(int a, int l)
     {
       cx += xstep;
       cy -= ystep;
-      rx += xstep;
-      ry += ystep;
-      /* rx += xstep;
-      ry -= ystep; */
-      tx-= xstep;
-      ty-= ystep;
-      itx-=xstep;
-      ity-=ystep;
     }
     else
     {
       cx -= xstep;
       cy -= ystep;
-      rx += xstep;
-      ry -= ystep;
-      /* rx += xstep;
-      ry += ystep; */
-      tx-= xstep;
-      ty+= ystep;
-      itx+=xstep;
-      ity-=ystep;
     }
   }
   else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
@@ -587,27 +485,11 @@ void RandomMoving(int a, int l)
     {
       cx += xstep;
       cy -= ystep;
-      rx -= xstep;
-      ry += ystep;
-      /* rx -= xstep;
-      ry -= ystep; */
-      tx+= xstep;
-      ty-= ystep;
-      itx-=xstep;
-      ity-=ystep;
     }
     else
     {
       cx += xstep;
       cy += ystep;
-      rx -= xstep;
-      ry -= ystep;
-      /* rx -= xstep;
-      ry += ystep; */
-      tx-= xstep;
-      ty-= ystep;
-      itx+=xstep;
-      ity-=ystep;
     }
   }
   else//원:오른쪽 / 네모:위 / 세모:왼쪽
@@ -616,32 +498,159 @@ void RandomMoving(int a, int l)
     {
       cx -= xstep;
       cy -= ystep;
-
-      rx += xstep;
-      ry -= ystep;
-
-      tx+= xstep;
-      ty-= ystep;
-
-      itx-=xstep;
-      ity-=ystep;
     }
     else
     {
       cx -= xstep;
       cy += ystep;
+    }
+  }
+}
 
+void rectRandomMoving(int a, int l)
+{
+  srand((unsigned int)time(NULL));
+  xstep = rand() % 20 + 10;
+  srand((unsigned int)time(NULL));
+  ystep = rand() % 20 + 10;
+
+  if (a == 0)//원:위/ 네모:왼쪽/세모:오른쪽
+  {
+    if (l == 0)
+    {
+      rx += xstep;
+      ry += ystep;
+    }
+    else
+    {
+      rx += xstep;
+      ry -= ystep;
+    }
+  }
+  else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
+  {
+    if (l == 0)
+    {
+      rx -= xstep;
+      ry += ystep;
+    }
+    else
+    {
       rx -= xstep;
       ry -= ystep;
+    }
+  }
+  else//원:오른쪽 / 네모:위 / 세모:왼쪽
+  {
+    if (l == 0)
+    {
+      rx += xstep;
+      ry -= ystep;
+    }
+    else
+    {
+      rx -= xstep;
+      ry -= ystep;
+    }
+  }
+}
 
+void triRandomMoving(int a, int l)
+{
+  srand((unsigned int)time(NULL));
+  xstep = rand() % 20 + 10;
+  srand((unsigned int)time(NULL));
+  ystep = rand() % 20 + 10;
+
+  if (a == 0)//원:위/ 네모:왼쪽/세모:오른쪽
+  {
+    if (l == 0)
+    {
+      tx-= xstep;
+      ty-= ystep;
+    }
+    else
+    {
+      tx-= xstep;
+      ty+= ystep;
+    }
+  }
+  else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
+  {
+    if (l == 0)
+    {
+      tx+= xstep;
+      ty-= ystep;
+    }
+    else
+    {
+      tx-= xstep;
+      ty-= ystep;
+    }
+  }
+  else//원:오른쪽 / 네모:위 / 세모:왼쪽
+  {
+    if (l == 0)
+    {
+      tx+= xstep;
+      ty-= ystep;
+    }
+    else
+    {
       tx+= xstep;
       ty+= ystep;
+    }
+  }
+}
 
+void inTriRandomMoving(int a, int l)
+{
+  srand((unsigned int)time(NULL));
+  xstep = rand() % 20 + 10;
+  srand((unsigned int)time(NULL));
+  ystep = rand() % 20 + 10;
+
+  if (a == 0)//원:위/ 네모:왼쪽/세모:오른쪽
+  {
+    if (l == 0)
+    {
+      itx-=xstep;
+      ity-=ystep;
+    }
+    else
+    {
+      itx+=xstep;
+      ity-=ystep;
+    }
+  }
+  else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
+  {
+    if (l == 0)
+    {
+      itx-=xstep;
+      ity-=ystep;
+    }
+    else
+    {
+      itx+=xstep;
+      ity-=ystep;
+    }
+  }
+  else//원:오른쪽 / 네모:위 / 세모:왼쪽
+  {
+    if (l == 0)
+    {
+      itx-=xstep;
+      ity-=ystep;
+    }
+    else
+    {
       itx+=xstep;
       ity-=ystep;
     }
   }
 }
+
 void CVtoGL()
 {
 
@@ -920,16 +929,15 @@ void desLife()
 
 void warning(Mat &image){
 
-  cv::Scalar cc(0, 0, 255);
+ cv::Scalar cc(0, 0, 255);
   double alpha = 0.5;
 
- if (facePts[0].x<60||facePts[20].y<80||facePts[16].x>545||facePts[8].y>420) //입안에 들어왔을 때
+  if (facePts[0].x < 40 || facePts[20].y < 40 || facePts[16].x > 600 || facePts[8].y > 440) //입안에 들어왔을 때
   {
-    cv::Mat roi = image(cv::Rect(60, 80, 500, 340));
-    cv::Mat color(roi.size(), CV_8UC3, cv::Scalar(0, 0, 255)); 
+    cv::Mat roi = image(cv::Rect(40, 40,600, 440));
+    cv::Mat color(roi.size(), CV_8UC3, cv::Scalar(0, 0, 255));
     double alpha = 0.3;
-    cv::addWeighted(color, alpha, roi, 1.0 - alpha , 0.0, roi); 
-  
+    cv::addWeighted(color, alpha, roi, 1.0 - alpha, 0.0, roi);
   }
 }
 
@@ -976,90 +984,50 @@ void display()
   //   desLife();
   // }
 
- if (cx + radius2 > 690 &&rx+radiusR >640&&tx>690&&itx>690)
-  {                 //오른쪽벽과의 충돌여부
-    radius2 = NULL; //충돌했다면 종료하고 새로 호출
-    radiusR = NULL;
-    radiusT = NULL;
-    radiusIT = NULL;
-    radiusR = 50.0;
-    //reset
-    radius2 = 25.0;
-    radiusT = 25.0;
-    radiusIT = 25.0;
-    
-    if (ColorIndex >= 8)
+ /////////원 충돌 확인///////////////////////
+ if(cx + radius2 > 690)
+ {
+   radius2 = NULL;
+   radius2 = 25.0;
+   if (ColorIndex >= 8)
       ColorIndex = 0;
-    else
+   else
       ColorIndex = ColorIndex + 1;
-    /* RandomCircle(a,l);
-    RandomRect(a,l); */
-    Random(a,l);
-    
-  }
- 
-  if (cx - radius2 < -690 && rx<-640&&tx<-690&&itx<-690)
-  { //왼쪽벽
-    radius2 = NULL;
-    radiusR = NULL;
-    radiusT = NULL;
-    radiusIT = NULL;
-    radiusR = 50.0;
-    //reset
-    radius2 = 25.0;
-    radiusT = 25.0;
-    radiusIT = 25.0;
-    if (ColorIndex >= 8)
+   circleRandom(a,l);
+ }
+ if(cx - radius2 < -690)
+ {
+   radius2 = NULL;
+   radius2 = 25.0;
+   if (ColorIndex >= 8)
       ColorIndex = 0;
-    else
+   else
       ColorIndex = ColorIndex + 1;
-
-   Random(a,l);
-    
-  }
-
-  if (cy - radius2 < -530 && ry-radiusR < -480 && ty<-550 && ity<-550)
-  { //바닥
-    radius2 = NULL;
-    radiusR = NULL;
-    radiusT = NULL;
-    radiusIT = NULL;
-    radiusR = 50.0;
-    //reset
-    radius2 = 25.0;
-    radiusT = 25.0;
-    radiusIT = 25.0;
-
-    if (ColorIndex >= 8)
+   circleRandom(a,l);
+ }
+ if(cy - radius2 < -530)
+ {
+   radius2 = NULL;
+   radius2 = 25.0;
+   if (ColorIndex >= 8)
       ColorIndex = 0;
-    else
+   else
       ColorIndex = ColorIndex + 1;
-    Random(a,l);
-    
-  }
-
-  if (cy + radius2 > 530&&ry > 480 && ty>550 && ity>550)
-  { //천장
-    radius2 = NULL;
-    radiusR = NULL;
-    radiusT = NULL;
-    radiusIT = NULL;
-    radiusR = 50.0;
-    //reset
-    radius2 = 25.0;
-    radiusT = 25.0;
-    radiusIT = 25.0;
-
-    if (ColorIndex >= 8)
+   circleRandom(a,l);
+ }
+ if(cy + radius2 > 530)
+ {
+   radius2 = NULL;
+   radius2 = 25.0;
+   if (ColorIndex >= 8)
       ColorIndex = 0;
-    else
+   else
       ColorIndex = ColorIndex + 1;
-    Random(a,l);
-    
-  }
+   circleRandom(a,l);
+ }
 
 ////////사각형 충돌 확인////////////////////////////////////
-  /* if(rx+radiusR >640)
+  if(rx+radiusR >700)//오
   {
     radiusR = NULL;
     radiusR = 50.0;
@@ -1067,9 +1035,9 @@ void display()
       ColorIndex = 0;
     else
       ColorIndex = ColorIndex + 1;
-    RandomRect(a,l);
+    rectRandom(a,l);
   }
-  if(rx<-640)
+  if(rx<-700)//왼
   {
     radiusR = NULL;
     radiusR = 50.0;
@@ -1077,9 +1045,9 @@ void display()
       ColorIndex = 0;
     else
       ColorIndex = ColorIndex + 1;
-    RandomRect(a,l);
+    rectRandom(a,l);
   }
-  if(ry-radiusR < -480)
+  if(ry-radiusR < -530)//바닥
   {
     radiusR = NULL;
     radiusR = 50.0;
@@ -1087,9 +1055,9 @@ void display()
       ColorIndex = 0;
     else
       ColorIndex = ColorIndex + 1;
-    RandomRect(a,l);
+    rectRandom(a,l);
   }
-  if(ry > 480)
+  if(ry > 530)//천장
   {
     radiusR = NULL;
     radiusR = 50.0;
@@ -1097,18 +1065,127 @@ void display()
       ColorIndex = 0;
     else
       ColorIndex = ColorIndex + 1;
-    RandomRect(a,l);
-  } */
+    rectRandom(a,l);
+  }
+  
+////////////삼각형 충돌 확인///////////////////////////////////////////////////
+ if (tx>690)
+  {                 //오른쪽벽과의 충돌여부
+    radiusT = NULL;
+    radiusT = 25.0;
+    
+    if (ColorIndex >= 8)
+      ColorIndex = 0;
+    else
+      ColorIndex = ColorIndex + 1;
  
-/////////세모 충돌 확인////////////////////////////////
-  //if()
+    triRandom(a,l);
+    
+  }
+ 
+  if (tx<-690)//cx - radius2 < -690 && 
+  { //왼쪽벽
+    radiusT = NULL;
+    radiusT = 25.0;
 
-  RandomMoving(a,l);
+    if (ColorIndex >= 8)
+      ColorIndex = 0;
+    else
+      ColorIndex = ColorIndex + 1;
+
+   triRandom(a,l);
+    
+  }
+
+  if (ty<-550)//cy - radius2 < -530 && 
+  { //바닥
+    radiusT = NULL;
+    radiusT = 25.0;;
+
+    if (ColorIndex >= 8)
+      ColorIndex = 0;
+    else
+      ColorIndex = ColorIndex + 1;
+    triRandom(a,l);
+    
+  }
+
+  if (ty>550) //cy + radius2 > 530&&
+  { //천장
+    radiusT = NULL;
+    radiusT = 25.0;
+
+    if (ColorIndex >= 8)
+      ColorIndex = 0;
+    else
+      ColorIndex = ColorIndex + 1;
+    triRandom(a,l);
+    
+  }
+
+/////////역삼각형 충돌 확인////////////////////////////////
+  if(itx>690)
+  {
+    radiusIT = NULL;
+    radiusIT = 25.0;
+
+    if (ColorIndex >= 8)
+      ColorIndex = 0;
+    else
+      ColorIndex = ColorIndex + 1;
+    
+    inTriRandom(a,l);
+  }
+
+  if(itx<-690)
+  {
+    radiusIT = NULL;
+    radiusIT = 25.0;
+
+    if (ColorIndex >= 8)
+      ColorIndex = 0;
+    else
+      ColorIndex = ColorIndex + 1;
+    
+    inTriRandom(a,l);
+  }
+
+  if(ity<-550)
+  {
+    radiusIT = NULL;
+    radiusIT = 25.0;
+
+    if (ColorIndex >= 8)
+      ColorIndex = 0;
+    else
+      ColorIndex = ColorIndex + 1;
+    
+    inTriRandom(a,l);
+  }
+
+  if(itx>690)
+  {
+    radiusIT = NULL;
+    radiusIT = 25.0;
+
+    if (ColorIndex >= 8)
+      ColorIndex = 0;
+    else
+      ColorIndex = ColorIndex + 1;
+    
+    inTriRandom(a,l);
+  }
+
+  circleRandomMoving(a,l);
+  rectRandomMoving(a,l);
+  triRandomMoving(a,l);
+  inTriRandomMoving(a,l);
 
   Draw_Circle();
   Draw_Rect();
   Draw_Tri();
   Draw_inTri();
+
   draw_life();
 
   glPopMatrix();
@@ -1194,8 +1271,8 @@ void faceCam()
     nowLife = ooo;
     putText(im, text, cv::Point(10, 20), CV_FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(255, 255, 255));
     putText(im, dynamic_score, cv::Point(450, 30), CV_FONT_HERSHEY_SIMPLEX, 1.0, CV_RGB(0, 0, 0), 2);
-    putText(im, nowLife, cv::Point(500, 470), CV_FONT_HERSHEY_SIMPLEX, 1.0, CV_RGB(0, 0, 0), 2);
- rectangle(im, Point(60, 80), Point(560, 420), c, 3); 
+    //putText(im, nowLife, cv::Point(500, 470), CV_FONT_HERSHEY_SIMPLEX, 1.0, CV_RGB(0, 0, 0), 2);
+ rectangle(im, Point(40, 40), Point(600, 440), c, 3);
  }
 }
 void timer(int value)
