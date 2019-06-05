@@ -49,6 +49,8 @@
 using namespace cv;
 using namespace std;
 
+void warning(Mat &);
+
 int screenW;
 int screenH;
 
@@ -57,7 +59,7 @@ int life = 3;
 string nowLife = "LIFE : ♥♥♡♡";
 
 cv::Point pts[6];
-Point redFace[27];
+Point facePts[27];
 float xPts[6];
 float yPts[6];
 
@@ -83,13 +85,31 @@ float height = 480; //윈도우 세로
 /* float width = 780;//윈도우 가로
 float height = 600; */
 
-float radius2 = 25.0; // 이동하는 공의 반지름
+float radius = 5.0;
+int num = 45;
+
+float radius1 = 20.0; //벽돌 반지름
+float radius2 = 25.0;  // 이동하는 공의 반지름
+float radiusR = 50.0;//정사각형 한변길이
+float radiusT = 25.0;//삼각형 높이/2
+float radiusIT = 25.0;
 
 float xp = 40.0;
 float yp = 40.0;
 
-GLfloat cx = -400;
-GLfloat cy = 505; //공의 x,y좌표
+/* GLfloat cx=-400;
+GLfloat cy=505; //공의 x,y좌표 */
+GLfloat cx;
+GLfloat cy;
+
+GLfloat rx;
+GLfloat ry;//정사각형의 왼쪽상단점
+
+GLfloat tx;
+GLfloat ty;
+
+GLfloat itx;
+GLfloat ity;
 
 float point_size = 3.0;
 GLenum draw_type;
@@ -98,16 +118,17 @@ GLfloat Red, Green, Blue; // glColor3f() 파라미터
 GLint ColorIndex;         // 색깔을 결정하는 배열 인덱스
 
 unsigned char PALETTE[9][3] = {
-    {255, 204, 255}, // FFCCFF
-    {255, 255, 51},  // FFFF33
-    {204, 255, 255}, // CCFFFF
-    {255, 51, 153},  // FF3399
-    {255, 255, 204}, //
-    {204, 204, 204}, // YELLOW
-    {255, 51, 0},    // PURPLE
-    {190, 0, 255},   // Violet
-    {204, 51, 255},  // BLACK
+    {0, 255, 255}, // CYAN
+    {0, 255, 0},   // GREEN
+    {0, 0, 255},   // BLUE
+    {255, 0, 0},   // RED
+    {255, 190, 0}, // Orange
+    {255, 255, 0}, // YELLOW
+    {255, 0, 255}, // PURPLE
+    {190, 0, 255}, // Violet
+    {0, 0, 0},     // BLACK
 };
+
 //색깔을 초기화 하는 함수
 void Color()
 {
@@ -124,6 +145,41 @@ int aSelect()
   return a;
 }
 
+int lSelect(){
+  srand((unsigned int)time(NULL));
+  int l=rand() % 2;
+  return l;
+}
+
+void draw_life(){
+
+  if(life==1){
+
+  }else if(life==2){
+
+  }else if(life==3){
+
+          int max=1100;
+  int y=-420;
+    glBegin(GL_POLYGON);
+        glVertex2i(max / 2, y); //1
+        glVertex2i((max / 2) - 10, y+10); //2
+        glVertex2i((max / 2) - 30, y+10); //3
+        glVertex2i((max / 2) - 35, y+5); //4
+        glVertex2i((max / 2) - 35, y-10); //5
+        glVertex2i(max / 2, y-50); //6
+        glVertex2i((max / 2) + 35, y-10); //7
+        glVertex2i((max / 2) + 35, y+5); //8
+        glVertex2i((max / 2) + 30, y+10); //9
+        glVertex2i((max / 2) + 10, y+10); //10
+        glEnd();
+
+  
+  }
+
+}
+
+
 void Draw_Circle()
 {
   int num = 45;
@@ -139,88 +195,225 @@ void Draw_Circle()
   glEnd();
 }
 
-void Random(int a)
+void Draw_Rect()
 {
-  //Draw_Circle();
-  if (a == 0) //위에서 떨어지는거
-  {
-    srand((unsigned int)time(NULL));
-    cx = rand() % 1231 - 615;
-    cy = 505;
-  }
-
-  else if (a == 1) //왼쪽에서 나오는거
-  {
-    srand((unsigned int)time(NULL));
-    cx = -665;
-    cy = rand() % 911 - 455;
-  }
-
-  else //오른쪽에서 나오는 거
-  {
-    srand((unsigned int)time(NULL));
-    cx = 665;
-    cy = rand() % 911 - 455;
-  }
-
-  Draw_Circle();
+  Color();
+  //glColor3f(255, 255, 255);
+	glBegin(GL_POLYGON);
+	glVertex2f(rx, ry);//왼쪽상단
+	glVertex2f(rx+radiusR, ry);//오른쪽상단
+	glVertex2f(rx + radiusR, ry + radiusR);//오른쪽하단
+  glVertex2f(rx, ry+ radiusR);//왼쪽하단
+	glEnd();
+}
+void Draw_Tri()
+{
+  Color();
+  //glColor3f(255, 255, 255);
+  glBegin(GL_TRIANGLES);
+  glVertex2f(tx-radiusT, ty-2*radiusT);
+  glVertex2f(tx+radiusT, ty-2*radiusT);
+  glVertex2f(tx, ty);
+  glEnd();
+}
+void Draw_inTri() //역삼각형
+{
+  Color();
+  //glColor3f(255, 255, 255);
+  glBegin(GL_TRIANGLES);
+  glVertex2f(itx-radiusIT, ity+2*radiusIT);
+  glVertex2f(itx+radiusIT, ity+2*radiusIT);
+  glVertex2f(itx, ity);
+  glEnd();
 }
 
-void RandomMoving(int a)
+void Random(int a, int l)
 {
+  srand((unsigned int)time(NULL));
+  //int l=rand() % 2;
+  //Draw_Circle();
+   if (a == 0)//원:위/ 네모:왼쪽/세모:오른쪽
+   {
+      srand((unsigned int)time(NULL));
+      rx=-690;
+      tx=665;
+      if(l=0)//왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
+      {
+        cx=rand()%616-615;
+        ry=rand()%431-430;
+        //ry=rand()%406+25;
+        ty=rand()%431+50;
+        //itx=rand()%491+50;
+      }
+      else//오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
+      {
+        cx=rand()%615+1;
+        ry=rand()%406+25;
+        //ry=rand()%431-430;
+        ty=rand()%431-430;
+        //itx=rand()%541-540;
+      }
+      cy = 505;
+      //ity=480;
+   }
 
+   else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
+   {
+      srand((unsigned int)time(NULL));
+      cx = -665;
+      rx=640;
+      if(l=0)//원:위 / 네모:아래
+      {
+        cy=rand()%456-455;
+        ry=rand()%431-430;
+        //ry=rand()%406+25;
+        tx=rand()%566-590;
+        //itx=rand()%491+50;
+      }
+      else//원:아래 / 네모:위
+      {
+        cy=rand()%455+1;
+        ry=rand()%406+25;
+        //ry=rand()%431-430;
+        tx=rand()%591;
+        //itx=rand()%541-540;
+      }
+      ty=530;
+      //ity=480;
+   }
+
+   else//원:오른쪽 / 네모:위 / 세모:왼쪽
+   {
+      srand((unsigned int)time(NULL));
+      cx = 665;
+      tx=-665;
+      if(l=0)//위쪽 or 왼쪽
+      {
+        cy=rand()%456-455;
+        ry=rand()%591-615;
+        ty=rand()%431+50;
+        //itx=rand()%491+50;
+      }
+      else//아래쪽 or 오른쪽
+      {
+        cy=rand()%455+1;
+        ry=rand()%566;
+        ty=rand()%431-430;
+        //itx=rand()%541-540;
+      }
+      ry=530;
+      //ity=480;
+   }
+   
+   Draw_Circle();
+   Draw_Rect();
+   Draw_Tri();
+   Draw_inTri();
+}
+
+void RandomMoving(int a, int l)
+{
   GLfloat xstep;
   GLfloat ystep; // 공의 속도
+  
+  srand((unsigned int)time(NULL));
+  //int l = rand() % 2;
 
   srand((unsigned int)time(NULL));
-  int l = rand() % 2;
-
+  xstep = rand() % 20 + 10;
   srand((unsigned int)time(NULL));
-  xstep = rand() % 15 + 5;
-  srand((unsigned int)time(NULL));
-  ystep = rand() % 15 + 5;
+  ystep = rand() % 20 + 10;
 
-  if (a == 0)
+  if (a == 0)//원:위/ 네모:왼쪽/세모:오른쪽
   {
     if (l == 0)
     {
       cx += xstep;
       cy -= ystep;
+      rx += xstep;
+      ry += ystep;
+      /* rx += xstep;
+      ry -= ystep; */
+      tx-= xstep;
+      ty-= ystep;
+      itx-=xstep;
+      ity-=ystep;
     }
     else
     {
       cx -= xstep;
       cy -= ystep;
+      rx += xstep;
+      ry -= ystep;
+      /* rx += xstep;
+      ry += ystep; */
+      tx-= xstep;
+      ty+= ystep;
+      itx+=xstep;
+      ity-=ystep;
     }
   }
-  else if (a == 1)
+  else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
   {
     if (l == 0)
+    {
+      cx += xstep;
+      cy -= ystep;
+      rx -= xstep;
+      ry += ystep;
+      /* rx -= xstep;
+      ry -= ystep; */
+      tx+= xstep;
+      ty-= ystep;
+      itx-=xstep;
+      ity-=ystep;
+    }
+    else
     {
       cx += xstep;
       cy += ystep;
-    }
-    else
-    {
-      cx += xstep;
-      cy -= ystep;
+      rx -= xstep;
+      ry -= ystep;
+      /* rx -= xstep;
+      ry += ystep; */
+      tx-= xstep;
+      ty-= ystep;
+      itx+=xstep;
+      ity-=ystep;
     }
   }
-  else
+  else//원:오른쪽 / 네모:위 / 세모:왼쪽
   {
     if (l == 0)
     {
       cx -= xstep;
-      cy += ystep;
+      cy -= ystep;
+
+      rx += xstep;
+      ry -= ystep;
+
+      tx+= xstep;
+      ty-= ystep;
+
+      itx-=xstep;
+      ity-=ystep;
     }
     else
     {
       cx -= xstep;
-      cy -= ystep;
+      cy += ystep;
+
+      rx -= xstep;
+      ry -= ystep;
+
+      tx+= xstep;
+      ty+= ystep;
+
+      itx+=xstep;
+      ity-=ystep;
     }
   }
 }
-
 void CVtoGL()
 {
 
@@ -258,17 +451,17 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
                    shape.at<double>(tri.at<int>(i, 0) + n, 0));
     p2 = cv::Point(shape.at<double>(tri.at<int>(i, 1), 0),
                    shape.at<double>(tri.at<int>(i, 1) + n, 0));
-    cv::line(image, p1, p2, c);
+    //cv::line(image, p1, p2, c);
     p1 = cv::Point(shape.at<double>(tri.at<int>(i, 0), 0),
                    shape.at<double>(tri.at<int>(i, 0) + n, 0));
     p2 = cv::Point(shape.at<double>(tri.at<int>(i, 2), 0),
                    shape.at<double>(tri.at<int>(i, 2) + n, 0));
-    cv::line(image, p1, p2, c);
+    //cv::line(image, p1, p2, c);
     p1 = cv::Point(shape.at<double>(tri.at<int>(i, 2), 0),
                    shape.at<double>(tri.at<int>(i, 2) + n, 0));
     p2 = cv::Point(shape.at<double>(tri.at<int>(i, 1), 0),
                    shape.at<double>(tri.at<int>(i, 1) + n, 0));
-    cv::line(image, p1, p2, c);
+    //cv::line(image, p1, p2, c);
   }
   //draw connections
   c = CV_RGB(0, 0, 255); //파란선
@@ -280,7 +473,7 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
                    shape.at<double>(con.at<int>(0, i) + n, 0));
     p2 = cv::Point(shape.at<double>(con.at<int>(1, i), 0),
                    shape.at<double>(con.at<int>(1, i) + n, 0));
-    cv::line(image, p1, p2, c, 1);
+    //cv::line(image, p1, p2, c, 1);
   }
   //draw points
   for (i = 0; i < n; i++)
@@ -290,19 +483,19 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
     //
     p1 = cv::Point(shape.at<double>(i, 0), shape.at<double>(i + n, 0));
     c = CV_RGB(255, 0, 0); //빨간 원
-    cv::circle(image, p1, 2, c);
+   // cv::circle(image, p1, 2, c);
     //cv::putText(image,std::to_string(i),p1,CV_FONT_HERSHEY_COMPLEX,0.5,c); //인덱싱
 
     if (i <= 26)
     {
-      redFace[face_cnt++] = p1;
+      facePts[face_cnt++] = p1;
     }
 
     if (i == 60 || i == 61 || i == 62 || i == 63 || i == 64 || i == 65)
     {
       pts[pts_count++] = p1;
       c = CV_RGB(0, 0, 0);
-      cv::putText(image, std::to_string(i), p1, CV_FONT_HERSHEY_COMPLEX, 0.5, c);
+      //cv::putText(image, std::to_string(i), p1, CV_FONT_HERSHEY_COMPLEX, 0.5, c);
     }
   }
 
@@ -310,6 +503,9 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
   //영역의 크기 구하기
   c = CV_RGB(255, 0, 0);
   cv::fillConvexPoly(image, pts, 6, c);
+
+    warning(image);
+
   return;
 }
 //=============================================================================
@@ -474,9 +670,9 @@ void desLife()
   if (life == 0)
   {
 
-    image.copyTo(copy);
-    fillConvexPoly(copy, redFace, 27, cc);
-    addWeighted(copy, alpha, image, 1 - alpha, 0, image);
+    im.copyTo(copy);//추가
+    fillConvexPoly(copy, facePts, 27, cc);
+    addWeighted(copy, alpha, im, 1 - alpha, 0, im);//추가
     //sleep(1000);
     exit(0);
   }
@@ -493,6 +689,22 @@ void desLife()
     nowLife = "❤❤❤";
   }
 }
+
+void warning(Mat &image){
+
+  cv::Scalar cc(0, 0, 255);
+  double alpha = 0.5;
+
+ if (facePts[0].x<60||facePts[20].y<80||facePts[16].x>545||facePts[8].y>420) //입안에 들어왔을 때
+  {
+    cv::Mat roi = image(cv::Rect(60, 80, 500, 340));
+    cv::Mat color(roi.size(), CV_8UC3, cv::Scalar(0, 0, 255)); 
+    double alpha = 0.3;
+    cv::addWeighted(color, alpha, roi, 1.0 - alpha , 0.0, roi); 
+  
+  }
+}
+
 
 void display()
 {
@@ -514,7 +726,9 @@ void display()
   float deltaX = xp - cx;
   float deltaY = yp - cy;
 
-  int a = aSelect();
+  int a=aSelect();
+  int l=lSelect();
+
   // glBegin(GL_QUADS);
   // glVertex2f(xPts[0], yPts[0]);
   // glVertex2f(xPts[2], yPts[2]);
@@ -534,57 +748,140 @@ void display()
   //   desLife();
   // }
 
-  if (cx + radius2 > 690)
+ if (cx + radius2 > 690 &&rx+radiusR >640&&tx>690&&itx>690)
   {                 //오른쪽벽과의 충돌여부
     radius2 = NULL; //충돌했다면 종료하고 새로 호출
+    radiusR = NULL;
+    radiusT = NULL;
+    radiusIT = NULL;
+    radiusR = 50.0;
     //reset
     radius2 = 25.0;
+    radiusT = 25.0;
+    radiusIT = 25.0;
+    
     if (ColorIndex >= 8)
       ColorIndex = 0;
     else
       ColorIndex = ColorIndex + 1;
-    Random(a);
+    /* RandomCircle(a,l);
+    RandomRect(a,l); */
+    Random(a,l);
+    
   }
-
-  if (cx - radius2 < -690)
+ 
+  if (cx - radius2 < -690 && rx<-640&&tx<-690&&itx<-690)
   { //왼쪽벽
     radius2 = NULL;
-
+    radiusR = NULL;
+    radiusT = NULL;
+    radiusIT = NULL;
+    radiusR = 50.0;
+    //reset
     radius2 = 25.0;
+    radiusT = 25.0;
+    radiusIT = 25.0;
     if (ColorIndex >= 8)
       ColorIndex = 0;
     else
       ColorIndex = ColorIndex + 1;
-    Random(a);
+
+   Random(a,l);
+    
   }
 
-  if (cy - radius2 < -530)
+  if (cy - radius2 < -530 && ry-radiusR < -480 && ty<-550 && ity<-550)
   { //바닥
     radius2 = NULL;
-
+    radiusR = NULL;
+    radiusT = NULL;
+    radiusIT = NULL;
+    radiusR = 50.0;
+    //reset
     radius2 = 25.0;
+    radiusT = 25.0;
+    radiusIT = 25.0;
+
     if (ColorIndex >= 8)
       ColorIndex = 0;
     else
       ColorIndex = ColorIndex + 1;
-    Random(a);
+    Random(a,l);
+    
   }
 
-  if (cy + radius2 > 530)
+  if (cy + radius2 > 530&&ry > 480 && ty>550 && ity>550)
   { //천장
     radius2 = NULL;
-
+    radiusR = NULL;
+    radiusT = NULL;
+    radiusIT = NULL;
+    radiusR = 50.0;
+    //reset
     radius2 = 25.0;
+    radiusT = 25.0;
+    radiusIT = 25.0;
+
     if (ColorIndex >= 8)
       ColorIndex = 0;
     else
       ColorIndex = ColorIndex + 1;
-    Random(a);
+    Random(a,l);
+    
   }
 
-  RandomMoving(a);
+////////사각형 충돌 확인////////////////////////////////////
+  /* if(rx+radiusR >640)
+  {
+    radiusR = NULL;
+    radiusR = 50.0;
+    if (ColorIndex >= 8)
+      ColorIndex = 0;
+    else
+      ColorIndex = ColorIndex + 1;
+    RandomRect(a,l);
+  }
+  if(rx<-640)
+  {
+    radiusR = NULL;
+    radiusR = 50.0;
+    if (ColorIndex >= 8)
+      ColorIndex = 0;
+    else
+      ColorIndex = ColorIndex + 1;
+    RandomRect(a,l);
+  }
+  if(ry-radiusR < -480)
+  {
+    radiusR = NULL;
+    radiusR = 50.0;
+    if (ColorIndex >= 8)
+      ColorIndex = 0;
+    else
+      ColorIndex = ColorIndex + 1;
+    RandomRect(a,l);
+  }
+  if(ry > 480)
+  {
+    radiusR = NULL;
+    radiusR = 50.0;
+    if (ColorIndex >= 8)
+      ColorIndex = 0;
+    else
+      ColorIndex = ColorIndex + 1;
+    RandomRect(a,l);
+  } */
+ 
+/////////세모 충돌 확인////////////////////////////////
+  //if()
+
+  RandomMoving(a,l);
 
   Draw_Circle();
+  Draw_Rect();
+  Draw_Tri();
+  Draw_inTri();
+  draw_life();
 
   glPopMatrix();
   glutSwapBuffers();
