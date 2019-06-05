@@ -49,6 +49,8 @@
 using namespace cv;
 using namespace std;
 
+void warning(Mat &);
+
 int screenW;
 int screenH;
 
@@ -57,7 +59,7 @@ int life = 3;
 string nowLife = "LIFE : ♥♥♡♡";
 
 cv::Point pts[6];
-Point redFace[27];
+Point facePts[27];
 float xPts[6];
 float yPts[6];
 
@@ -95,19 +97,17 @@ float radiusIT = 25.0;
 float xp = 40.0;
 float yp = 40.0;
 
-/* GLfloat cx=-400;
-GLfloat cy=505; //공의 x,y좌표 */
-GLfloat cx;
-GLfloat cy;
+GLfloat cx=-400;
+GLfloat cy=505;
 
-GLfloat rx;
-GLfloat ry;//정사각형의 왼쪽상단점
+GLfloat rx=-690;
+GLfloat ry=25;//정사각형의 왼쪽상단점
 
-GLfloat tx;
-GLfloat ty;
+GLfloat tx=665;
+GLfloat ty=-200;
 
-GLfloat itx;
-GLfloat ity;
+GLfloat itx=-250;
+GLfloat ity=480;
 
 float point_size = 3.0;
 GLenum draw_type;
@@ -148,6 +148,35 @@ int lSelect(){
   int l=rand() % 2;
   return l;
 }
+
+void draw_life(){
+
+  if(life==1){
+
+  }else if(life==2){
+
+  }else if(life==3){
+
+          int max=1100;
+  int y=-420;
+    glBegin(GL_POLYGON);
+        glVertex2i(max / 2, y); //1
+        glVertex2i((max / 2) - 10, y+10); //2
+        glVertex2i((max / 2) - 30, y+10); //3
+        glVertex2i((max / 2) - 35, y+5); //4
+        glVertex2i((max / 2) - 35, y-10); //5
+        glVertex2i(max / 2, y-50); //6
+        glVertex2i((max / 2) + 35, y-10); //7
+        glVertex2i((max / 2) + 35, y+5); //8
+        glVertex2i((max / 2) + 30, y+10); //9
+        glVertex2i((max / 2) + 10, y+10); //10
+        glEnd();
+
+  
+  }
+
+}
+
 
 void Draw_Circle()
 {
@@ -196,6 +225,211 @@ void Draw_inTri() //역삼각형
   glEnd();
 }
 
+void circleRandom(int a, int l)
+{
+  srand((unsigned int)time(NULL));
+  //int l=rand() % 2;
+  //Draw_Circle();
+   if (a == 0)//원:위/ 네모:왼쪽/세모:오른쪽
+   {
+      srand((unsigned int)time(NULL));
+      if(l=0)//왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
+      {
+        cx=rand()%616-615;
+      }
+      else//오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
+      {
+        cx=rand()%615+1;
+
+      }
+      cy = 505;
+   }
+
+   else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
+   {
+      srand((unsigned int)time(NULL));
+      cx = -665;
+      if(l=0)//원:위 / 네모:아래
+      {
+        cy=rand()%456-455;
+      }
+      else//원:아래 / 네모:위
+      {
+        cy=rand()%455+1;
+      }
+   }
+
+   else//원:오른쪽 / 네모:위 / 세모:왼쪽
+   {
+      srand((unsigned int)time(NULL));
+      cx = 665;
+      if(l=0)//위쪽 or 왼쪽
+      {
+        cy=rand()%456-455;
+      }
+      else//아래쪽 or 오른쪽
+      {
+        cy=rand()%455+1;
+      }
+   }
+   
+   Draw_Circle();
+}
+
+void rectRandom(int a, int l)
+{
+  srand((unsigned int)time(NULL));
+  //int l=rand() % 2;
+  //Draw_Circle();
+   if (a == 0)//원:위/ 네모:왼쪽/세모:오른쪽
+   {
+      srand((unsigned int)time(NULL));
+      rx=-690;
+      if(l=0)//왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
+      {
+        ry=rand()%431-430;
+        //ry=rand()%406+25;
+      }
+      else//오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
+      {
+        ry=rand()%406+25;
+        //ry=rand()%431-430;
+      }
+   }
+
+   else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
+   {
+      srand((unsigned int)time(NULL));
+      rx=640;
+      if(l=0)//원:위 / 네모:아래
+      {
+        ry=rand()%431-430;
+        //ry=rand()%406+25;
+      }
+      else//원:아래 / 네모:위
+      {
+        ry=rand()%406+25;
+        //ry=rand()%431-430;
+      }
+   }
+
+   else//원:오른쪽 / 네모:위 / 세모:왼쪽
+   {
+      srand((unsigned int)time(NULL));
+      if(l=0)//위쪽 or 왼쪽
+      {
+        ry=rand()%591-615;
+      }
+      else//아래쪽 or 오른쪽
+      {
+        ry=rand()%566;
+      }
+      ry=530;
+   }
+   
+   Draw_Rect();
+}
+
+void triRandom(int a, int l)
+{
+  srand((unsigned int)time(NULL));
+  //int l=rand() % 2;
+  //Draw_Circle();
+   if (a == 0)//원:위/ 네모:왼쪽/세모:오른쪽
+   {
+      srand((unsigned int)time(NULL));
+      tx=665;
+      if(l=0)//왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
+      {
+        ty=rand()%431+50;
+      }
+      else//오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
+      {
+        ty=rand()%431-430;
+      }
+   }
+
+   else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
+   {
+      srand((unsigned int)time(NULL));
+      if(l=0)//원:위 / 네모:아래
+      {
+        tx=rand()%566-590;
+      }
+      else//원:아래 / 네모:위
+      {
+        tx=rand()%591;
+      }
+      ty=530;
+   }
+
+   else//원:오른쪽 / 네모:위 / 세모:왼쪽
+   {
+      srand((unsigned int)time(NULL));
+      tx=-665;
+      if(l=0)//위쪽 or 왼쪽
+      {
+        ty=rand()%431+50;
+      }
+      else//아래쪽 or 오른쪽
+      {
+        ty=rand()%431-430;
+      }
+   }
+
+   Draw_Tri();
+}
+
+void inTriRandom(int a, int l)
+{
+  srand((unsigned int)time(NULL));
+  //int l=rand() % 2;
+  //Draw_Circle();
+   if (a == 0)//원:위/ 네모:왼쪽/세모:오른쪽
+   {
+      srand((unsigned int)time(NULL));
+      if(l=0)//왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
+      {
+        itx=rand()%491+50;
+      }
+      else//오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
+      {
+        itx=rand()%541-540;
+      }
+      ity=480;
+   }
+
+   else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
+   {
+      srand((unsigned int)time(NULL));
+      if(l=0)//왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
+      {
+        itx=rand()%491+50;
+      }
+      else//오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
+      {
+        itx=rand()%541-540;
+      }
+      ity=480;
+   }
+
+   else//원:오른쪽 / 네모:위 / 세모:왼쪽
+   {
+      srand((unsigned int)time(NULL));
+      if(l=0)//왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
+      {
+        itx=rand()%491+50;
+      }
+      else//오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
+      {
+        itx=rand()%541-540;
+      }
+      ity=480;
+   }
+
+   Draw_inTri();
+}
+
 void Random(int a, int l)
 {
   srand((unsigned int)time(NULL));
@@ -212,7 +446,7 @@ void Random(int a, int l)
         ry=rand()%431-430;
         //ry=rand()%406+25;
         ty=rand()%431+50;
-        //itx=rand()%491+50;
+        itx=rand()%491+50;
       }
       else//오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
       {
@@ -220,10 +454,10 @@ void Random(int a, int l)
         ry=rand()%406+25;
         //ry=rand()%431-430;
         ty=rand()%431-430;
-        //itx=rand()%541-540;
+        itx=rand()%541-540;
       }
       cy = 505;
-      //ity=480;
+      ity=480;
    }
 
    else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
@@ -237,7 +471,7 @@ void Random(int a, int l)
         ry=rand()%431-430;
         //ry=rand()%406+25;
         tx=rand()%566-590;
-        //itx=rand()%491+50;
+        itx=rand()%491+50;
       }
       else//원:아래 / 네모:위
       {
@@ -245,10 +479,10 @@ void Random(int a, int l)
         ry=rand()%406+25;
         //ry=rand()%431-430;
         tx=rand()%591;
-        //itx=rand()%541-540;
+        itx=rand()%541-540;
       }
       ty=530;
-      //ity=480;
+      ity=480;
    }
 
    else//원:오른쪽 / 네모:위 / 세모:왼쪽
@@ -261,17 +495,17 @@ void Random(int a, int l)
         cy=rand()%456-455;
         ry=rand()%591-615;
         ty=rand()%431+50;
-        //itx=rand()%491+50;
+        itx=rand()%491+50;
       }
       else//아래쪽 or 오른쪽
       {
         cy=rand()%455+1;
         ry=rand()%566;
         ty=rand()%431-430;
-        //itx=rand()%541-540;
+        itx=rand()%541-540;
       }
       ry=530;
-      //ity=480;
+      ity=480;
    }
    
    Draw_Circle();
@@ -420,17 +654,17 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
                    shape.at<double>(tri.at<int>(i, 0) + n, 0));
     p2 = cv::Point(shape.at<double>(tri.at<int>(i, 1), 0),
                    shape.at<double>(tri.at<int>(i, 1) + n, 0));
-    cv::line(image, p1, p2, c);
+    //cv::line(image, p1, p2, c);
     p1 = cv::Point(shape.at<double>(tri.at<int>(i, 0), 0),
                    shape.at<double>(tri.at<int>(i, 0) + n, 0));
     p2 = cv::Point(shape.at<double>(tri.at<int>(i, 2), 0),
                    shape.at<double>(tri.at<int>(i, 2) + n, 0));
-    cv::line(image, p1, p2, c);
+    //cv::line(image, p1, p2, c);
     p1 = cv::Point(shape.at<double>(tri.at<int>(i, 2), 0),
                    shape.at<double>(tri.at<int>(i, 2) + n, 0));
     p2 = cv::Point(shape.at<double>(tri.at<int>(i, 1), 0),
                    shape.at<double>(tri.at<int>(i, 1) + n, 0));
-    cv::line(image, p1, p2, c);
+    //cv::line(image, p1, p2, c);
   }
   //draw connections
   c = CV_RGB(0, 0, 255); //파란선
@@ -442,7 +676,7 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
                    shape.at<double>(con.at<int>(0, i) + n, 0));
     p2 = cv::Point(shape.at<double>(con.at<int>(1, i), 0),
                    shape.at<double>(con.at<int>(1, i) + n, 0));
-    cv::line(image, p1, p2, c, 1);
+    //cv::line(image, p1, p2, c, 1);
   }
   //draw points
   for (i = 0; i < n; i++)
@@ -452,19 +686,19 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
     //
     p1 = cv::Point(shape.at<double>(i, 0), shape.at<double>(i + n, 0));
     c = CV_RGB(255, 0, 0); //빨간 원
-    cv::circle(image, p1, 2, c);
+   // cv::circle(image, p1, 2, c);
     //cv::putText(image,std::to_string(i),p1,CV_FONT_HERSHEY_COMPLEX,0.5,c); //인덱싱
 
     if (i <= 26)
     {
-      redFace[face_cnt++] = p1;
+      facePts[face_cnt++] = p1;
     }
 
     if (i == 60 || i == 61 || i == 62 || i == 63 || i == 64 || i == 65)
     {
       pts[pts_count++] = p1;
       c = CV_RGB(0, 0, 0);
-      cv::putText(image, std::to_string(i), p1, CV_FONT_HERSHEY_COMPLEX, 0.5, c);
+      //cv::putText(image, std::to_string(i), p1, CV_FONT_HERSHEY_COMPLEX, 0.5, c);
     }
   }
 
@@ -472,6 +706,9 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
   //영역의 크기 구하기
   c = CV_RGB(255, 0, 0);
   cv::fillConvexPoly(image, pts, 6, c);
+
+    warning(image);
+
   return;
 }
 //=============================================================================
@@ -636,11 +873,11 @@ void desLife()
   if (life == 0)
   {
 
-    //image.copyTo(copy);
-    //fillConvexPoly(copy, redFace, 27, cc);
-    //addWeighted(copy, alpha, image, 1 - alpha, 0, image);
+    im.copyTo(copy);//추가
+    fillConvexPoly(copy, facePts, 27, cc);
+    addWeighted(copy, alpha, im, 1 - alpha, 0, im);//추가
     //sleep(1000);
-    //exit(0);
+    exit(0);
   }
   else if (life == 1)
   {
@@ -655,6 +892,22 @@ void desLife()
     nowLife = "❤❤❤";
   }
 }
+
+void warning(Mat &image){
+
+  cv::Scalar cc(0, 0, 255);
+  double alpha = 0.5;
+
+ if (facePts[0].x<60||facePts[20].y<80||facePts[16].x>545||facePts[8].y>420) //입안에 들어왔을 때
+  {
+    cv::Mat roi = image(cv::Rect(60, 80, 500, 340));
+    cv::Mat color(roi.size(), CV_8UC3, cv::Scalar(0, 0, 255)); 
+    double alpha = 0.3;
+    cv::addWeighted(color, alpha, roi, 1.0 - alpha , 0.0, roi); 
+  
+  }
+}
+
 
 void display()
 {
@@ -831,6 +1084,7 @@ void display()
   Draw_Rect();
   Draw_Tri();
   Draw_inTri();
+  draw_life();
 
   glPopMatrix();
   glutSwapBuffers();
