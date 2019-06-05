@@ -181,6 +181,7 @@ int lSelect(){
 void draw_life(){
 
   if(life==1){
+     glColor3f(1.0, 0.0, 0.0);
     int max = 1200;
     int y = -430;
     glBegin(GL_POLYGON);
@@ -225,7 +226,6 @@ void draw_life(){
     glVertex2i((max / 2) + 10, y + 10); //10
     glEnd();
   }else if(life==3){
-
      glColor3f(1.0, 0.0, 0.0);
     int max = 1200;
     int y = -430;
@@ -1019,23 +1019,35 @@ void display()
   int a=aSelect();
   int l=lSelect();
 
-  if (xPts[0] < cx && xPts[2] > cx && cy < yPts[2] && cy > yPts[3]) //입안에 들어왔을 때
+if (xPts[0] <= cx && xPts[2] >= cx && cy <= yPts[2] && cy >= yPts[3]) //입안에 들어왔을 때
   {
+    cx = 990;
+    cy = 990;
     radius2 = 0;
-    score+=10;
+    score += 10;
   }
-  else if (xPts[0] < (rx+25) && xPts[2] > (rx+25) && (ry+25) < yPts[2] && (ry+25) > yPts[3]) //입안에 들어왔을 때
-  {//사각형 먹었을 때
+  if (xPts[0] < (rx + 25) && xPts[2] > (rx + 25) && (ry + 25) < yPts[2] && (ry + 25) > yPts[3]) //입안에 들어왔을 때
+  {                                                                                             //사각형 먹었을 때
+    rx = 990;
+    ry = 990;
     radiusR = 0;
-    score+=10;
+    score += 10;
   }
-  else if (xPts[0] < tx && xPts[2] > tx && (ty+25) < yPts[2] && (ty+25) > yPts[3]) //입안에 들어왔을 때
-  {//삼각형 (생명++)
+  else if (xPts[0] < tx && xPts[2] > tx && (ty + 25) < yPts[2] && (ty + 25) > yPts[3]) //입안에 들어왔을 때
+  {                                                                                    //삼각형 (생명++)
+    if (life < 3)
+    {
+      life++;
+    }
+    tx = 990;
+    ty = 990;
     radiusT = 0;
-    score+=10;
+    score += 10;
   }
-  else if (xPts[0] < itx && xPts[2] > itx && (ity+25) < yPts[2] && (ity+25) > yPts[3]) //입안에 들어왔을 때
-  {//역삼각형 생명 --
+  else if (xPts[0] < itx && xPts[2] > itx && (ity + 25) < yPts[2] && (ity + 25) > yPts[3]) //입안에 들어왔을 때
+  {                                                                                        //역삼각형 생명 --
+    itx = 990;
+    ity = 990;
     radiusIT = 0;
     desLife();
   }
