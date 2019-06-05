@@ -118,6 +118,11 @@ GLenum draw_type;
 GLfloat Red, Green, Blue; // glColor3f() 파라미터
 GLint ColorIndex;         // 색깔을 결정하는 배열 인덱스
 
+GLint circleColorIndex=0;         // 색깔을 결정하는 배열 인덱스
+GLint rectColorIndex=3;
+GLint triColorIndex=5;
+GLint inTriColorIndex=7;
+
 unsigned char PALETTE[9][3] = {
     {0, 255, 255}, // CYAN
     {0, 255, 0},   // GREEN
@@ -130,6 +135,35 @@ unsigned char PALETTE[9][3] = {
     {0, 0, 0},     // BLACK
 };
 
+//색깔을 초기화 하는 함수
+void circleColor()
+{
+  Red = PALETTE[circleColorIndex][0] / 255.0f;
+  Green = PALETTE[circleColorIndex][1] / 255.0f;
+  Blue = PALETTE[circleColorIndex][2] / 255.0f;
+  glColor3f(Red, Green, Blue);
+}
+void rectColor()
+{
+  Red = PALETTE[rectColorIndex][0] / 255.0f;
+  Green = PALETTE[rectColorIndex][1] / 255.0f;
+  Blue = PALETTE[rectColorIndex][2] / 255.0f;
+  glColor3f(Red, Green, Blue);
+}
+void triColor()
+{
+  Red = PALETTE[triColorIndex][0] / 255.0f;
+  Green = PALETTE[triColorIndex][1] / 255.0f;
+  Blue = PALETTE[triColorIndex][2] / 255.0f;
+  glColor3f(Red, Green, Blue);
+}
+void inTriColor()
+{
+  Red = PALETTE[inTriColorIndex][0] / 255.0f;
+  Green = PALETTE[inTriColorIndex][1] / 255.0f;
+  Blue = PALETTE[inTriColorIndex][2] / 255.0f;
+  glColor3f(Red, Green, Blue);
+}
 //색깔을 초기화 하는 함수
 void Color()
 {
@@ -155,9 +189,49 @@ int lSelect(){
 void draw_life(){
 
   if(life==1){
-
+    int max = 1200;
+    int y = -430;
+    glBegin(GL_POLYGON);
+    glVertex2i(max / 2, y);             //1
+    glVertex2i((max / 2) - 10, y + 10); //2
+    glVertex2i((max / 2) - 30, y + 10); //3
+    glVertex2i((max / 2) - 35, y + 5);  //4
+    glVertex2i((max / 2) - 35, y - 10); //5
+    glVertex2i(max / 2, y - 50);        //6
+    glVertex2i((max / 2) + 35, y - 10); //7
+    glVertex2i((max / 2) + 35, y + 5);  //8
+    glVertex2i((max / 2) + 30, y + 10); //9
+    glVertex2i((max / 2) + 10, y + 10); //10
+    glEnd();
   }else if(life==2){
-
+ glColor3f(1.0, 0.0, 0.0);
+    int max = 1200;
+    int y = -430;
+    glBegin(GL_POLYGON);
+    glVertex2i(max / 2, y);             //1
+    glVertex2i((max / 2) - 10, y + 10); //2
+    glVertex2i((max / 2) - 30, y + 10); //3
+    glVertex2i((max / 2) - 35, y + 5);  //4
+    glVertex2i((max / 2) - 35, y - 10); //5
+    glVertex2i(max / 2, y - 50);        //6
+    glVertex2i((max / 2) + 35, y - 10); //7
+    glVertex2i((max / 2) + 35, y + 5);  //8
+    glVertex2i((max / 2) + 30, y + 10); //9
+    glVertex2i((max / 2) + 10, y + 10); //10
+    glEnd();
+    max = 1000;
+    glBegin(GL_POLYGON);
+    glVertex2i(max / 2, y);             //1
+    glVertex2i((max / 2) - 10, y + 10); //2
+    glVertex2i((max / 2) - 30, y + 10); //3
+    glVertex2i((max / 2) - 35, y + 5);  //4
+    glVertex2i((max / 2) - 35, y - 10); //5
+    glVertex2i(max / 2, y - 50);        //6
+    glVertex2i((max / 2) + 35, y - 10); //7
+    glVertex2i((max / 2) + 35, y + 5);  //8
+    glVertex2i((max / 2) + 30, y + 10); //9
+    glVertex2i((max / 2) + 10, y + 10); //10
+    glEnd();
   }else if(life==3){
 
      glColor3f(1.0, 0.0, 0.0);
@@ -913,18 +987,6 @@ void desLife()
     //sleep(1000);
     exit(0);
   }
-  else if (life == 1)
-  {
-    nowLife = "❤♡♡";
-  }
-  else if (life == 2)
-  {
-    nowLife = "❤❤♡";
-  }
-  else if (life == 3)
-  {
-    nowLife = "❤❤❤";
-  }
 }
 
 void warning(Mat &image){
@@ -965,64 +1027,66 @@ void display()
   int a=aSelect();
   int l=lSelect();
 
-  // glBegin(GL_QUADS);
-  // glVertex2f(xPts[0], yPts[0]);
-  // glVertex2f(xPts[2], yPts[2]);
-  // glVertex2f(xPts[3], yPts[3]);
-  // glVertex2f(xPts[5], yPts[5]);
-  // glEnd();
-  // glFinish();
-
   if (xPts[0] < cx && xPts[2] > cx && cy < yPts[2] && cy > yPts[3]) //입안에 들어왔을 때
   {
     radius2 = 0;
-    score++;
+    score+=10;
   }
-
-  // if()//세모를 먹었을 때
-  // {
-  //   desLife();
-  // }
-
+  else if (xPts[0] < (rx+25) && xPts[2] > (rx+25) && (ry+25) < yPts[2] && (ry+25) > yPts[3]) //입안에 들어왔을 때
+  {//사각형 먹었을 때
+    radiusR = 0;
+    score+=10;
+  }
+  else if (xPts[0] < tx && xPts[2] > tx && (ty+25) < yPts[2] && (ty+25) > yPts[3]) //입안에 들어왔을 때
+  {//삼각형 (생명++)
+    radiusT = 0;
+    score+=10;
+  }
+  else if (xPts[0] < itx && xPts[2] > itx && (ity+25) < yPts[2] && (ity+25) > yPts[3]) //입안에 들어왔을 때
+  {//역삼각형 생명 --
+    radiusIT = 0;
+    desLife();
+  }
+  
  /////////원 충돌 확인///////////////////////
  if(cx + radius2 > 690)
  {
    radius2 = NULL;
    radius2 = 25.0;
-   if (ColorIndex >= 8)
-      ColorIndex = 0;
+   if (circleColorIndex >= 8)
+      circleColorIndex = 0;
    else
-      ColorIndex = ColorIndex + 1;
+      circleColorIndex = circleColorIndex + 1;
    circleRandom(a,l);
  }
  if(cx - radius2 < -690)
  {
    radius2 = NULL;
    radius2 = 25.0;
-   if (ColorIndex >= 8)
-      ColorIndex = 0;
+   if (circleColorIndex >= 8)
+      circleColorIndex = 0;
    else
-      ColorIndex = ColorIndex + 1;
+      circleColorIndex = circleColorIndex + 1;
    circleRandom(a,l);
  }
  if(cy - radius2 < -530)
  {
    radius2 = NULL;
    radius2 = 25.0;
-   if (ColorIndex >= 8)
-      ColorIndex = 0;
+   if (circleColorIndex >= 8)
+      circleColorIndex = 0;
    else
-      ColorIndex = ColorIndex + 1;
+      circleColorIndex = circleColorIndex + 1;
    circleRandom(a,l);
  }
  if(cy + radius2 > 530)
  {
    radius2 = NULL;
    radius2 = 25.0;
-   if (ColorIndex >= 8)
-      ColorIndex = 0;
+   if (circleColorIndex >= 8)
+      circleColorIndex = 0;
    else
-      ColorIndex = ColorIndex + 1;
+      circleColorIndex = circleColorIndex + 1;
    circleRandom(a,l);
  }
 
@@ -1031,40 +1095,40 @@ void display()
   {
     radiusR = NULL;
     radiusR = 50.0;
-    if (ColorIndex >= 8)
-      ColorIndex = 0;
+    if (rectColorIndex >= 8)
+      rectColorIndex = 0;
     else
-      ColorIndex = ColorIndex + 1;
+      rectColorIndex = rectColorIndex + 1;
     rectRandom(a,l);
   }
   if(rx<-700)//왼
   {
     radiusR = NULL;
     radiusR = 50.0;
-    if (ColorIndex >= 8)
-      ColorIndex = 0;
+    if (rectColorIndex >= 8)
+      rectColorIndex = 0;
     else
-      ColorIndex = ColorIndex + 1;
+      rectColorIndex = rectColorIndex + 1;
     rectRandom(a,l);
   }
   if(ry-radiusR < -530)//바닥
   {
     radiusR = NULL;
     radiusR = 50.0;
-    if (ColorIndex >= 8)
-      ColorIndex = 0;
+    if (rectColorIndex >= 8)
+      rectColorIndex = 0;
     else
-      ColorIndex = ColorIndex + 1;
+      rectColorIndex = rectColorIndex + 1;
     rectRandom(a,l);
   }
   if(ry > 530)//천장
   {
     radiusR = NULL;
     radiusR = 50.0;
-    if (ColorIndex >= 8)
-      ColorIndex = 0;
+    if (rectColorIndex >= 8)
+      rectColorIndex = 0;
     else
-      ColorIndex = ColorIndex + 1;
+      rectColorIndex = rectColorIndex + 1;
     rectRandom(a,l);
   }
   
@@ -1074,10 +1138,10 @@ void display()
     radiusT = NULL;
     radiusT = 25.0;
     
-    if (ColorIndex >= 8)
-      ColorIndex = 0;
+    if (triColorIndex >= 8)
+      triColorIndex = 0;
     else
-      ColorIndex = ColorIndex + 1;
+      triColorIndex = triColorIndex + 1;
  
     triRandom(a,l);
     
@@ -1088,10 +1152,10 @@ void display()
     radiusT = NULL;
     radiusT = 25.0;
 
-    if (ColorIndex >= 8)
-      ColorIndex = 0;
+    if (triColorIndex >= 8)
+      triColorIndex = 0;
     else
-      ColorIndex = ColorIndex + 1;
+      triColorIndex = triColorIndex + 1;
 
    triRandom(a,l);
     
@@ -1102,10 +1166,10 @@ void display()
     radiusT = NULL;
     radiusT = 25.0;;
 
-    if (ColorIndex >= 8)
-      ColorIndex = 0;
+    if (triColorIndex >= 8)
+      triColorIndex = 0;
     else
-      ColorIndex = ColorIndex + 1;
+      triColorIndex = triColorIndex + 1;
     triRandom(a,l);
     
   }
@@ -1115,10 +1179,10 @@ void display()
     radiusT = NULL;
     radiusT = 25.0;
 
-    if (ColorIndex >= 8)
-      ColorIndex = 0;
+    if (triColorIndex >= 8)
+      triColorIndex = 0;
     else
-      ColorIndex = ColorIndex + 1;
+      triColorIndex = triColorIndex + 1;
     triRandom(a,l);
     
   }
@@ -1129,10 +1193,10 @@ void display()
     radiusIT = NULL;
     radiusIT = 25.0;
 
-    if (ColorIndex >= 8)
-      ColorIndex = 0;
+    if (inTriColorIndex >= 8)
+      inTriColorIndex = 0;
     else
-      ColorIndex = ColorIndex + 1;
+      inTriColorIndex = inTriColorIndex + 1;
     
     inTriRandom(a,l);
   }
@@ -1142,10 +1206,10 @@ void display()
     radiusIT = NULL;
     radiusIT = 25.0;
 
-    if (ColorIndex >= 8)
-      ColorIndex = 0;
+    if (inTriColorIndex >= 8)
+      inTriColorIndex = 0;
     else
-      ColorIndex = ColorIndex + 1;
+      inTriColorIndex = inTriColorIndex + 1;
     
     inTriRandom(a,l);
   }
@@ -1155,10 +1219,10 @@ void display()
     radiusIT = NULL;
     radiusIT = 25.0;
 
-    if (ColorIndex >= 8)
-      ColorIndex = 0;
+    if (inTriColorIndex >= 8)
+      inTriColorIndex = 0;
     else
-      ColorIndex = ColorIndex + 1;
+      inTriColorIndex = inTriColorIndex + 1;
     
     inTriRandom(a,l);
   }
@@ -1168,10 +1232,10 @@ void display()
     radiusIT = NULL;
     radiusIT = 25.0;
 
-    if (ColorIndex >= 8)
-      ColorIndex = 0;
+    if (inTriColorIndex >= 8)
+      inTriColorIndex = 0;
     else
-      ColorIndex = ColorIndex + 1;
+      inTriColorIndex = inTriColorIndex + 1;
     
     inTriRandom(a,l);
   }
@@ -1270,7 +1334,7 @@ void faceCam()
     sprintf(ooo, "LIFE : %d", life);
     nowLife = ooo;
     putText(im, text, cv::Point(10, 20), CV_FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(255, 255, 255));
-    putText(im, dynamic_score, cv::Point(450, 30), CV_FONT_HERSHEY_SIMPLEX, 1.0, CV_RGB(0, 0, 0), 2);
+    putText(im, dynamic_score, cv::Point(440, 30), CV_FONT_HERSHEY_SIMPLEX, 0.8, CV_RGB(0, 0, 0), 2);
     //putText(im, nowLife, cv::Point(500, 470), CV_FONT_HERSHEY_SIMPLEX, 1.0, CV_RGB(0, 0, 0), 2);
  rectangle(im, Point(40, 40), Point(600, 440), c, 3);
  }
