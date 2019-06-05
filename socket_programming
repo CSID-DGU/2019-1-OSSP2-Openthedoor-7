@@ -17,6 +17,18 @@
 int user_idx;
 
 int first(char * myId, char * myPwd);
+int previousScore()
+
+int main(int argc, char **argv){
+
+char myId[100];
+char myPwd[100];
+int user_idx = -1;
+user_idx = first(myId, myPwd);
+printf("login complete");
+
+}
+
 
 int first(char * myId, char * myPwd){
         int sock, sign;
@@ -30,7 +42,7 @@ int first(char * myId, char * myPwd){
 	memset(&serv_addr, 0, sizeof(serv_addr));
 
 	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = inet_addr("13.209.29.192");
+	serv_addr.sin_addr.s_addr = inet_addr("13.124.167.29");
 	serv_addr.sin_port = htons(3090);
 
 
@@ -95,17 +107,6 @@ int first(char * myId, char * myPwd){
 	close(sock);
 	user_idx = (atoi)(buff);
 	return user_idx;
-}
-
-
-int main(int argc, char **argv){
-
-char myId[100];
-char myPwd[100];
-int user_idx = -1;
-user_idx = first(myId, myPwd);
-//printf("ID:\n");
-//printf("PW:\n");
 }
 
 int previousScore() {
