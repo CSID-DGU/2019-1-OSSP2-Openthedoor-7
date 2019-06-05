@@ -116,7 +116,7 @@ float point_size = 3.0;
 GLenum draw_type;
 
 GLfloat Red, Green, Blue; // glColor3f() 파라미터
-GLint ColorIndex;         // 색깔을 결정하는 배열 인덱스
+//GLint ColorIndex;         // 색깔을 결정하는 배열 인덱스
 
 GLint circleColorIndex=0;         // 색깔을 결정하는 배열 인덱스
 GLint rectColorIndex=3;
@@ -162,14 +162,6 @@ void inTriColor()
   Red = PALETTE[inTriColorIndex][0] / 255.0f;
   Green = PALETTE[inTriColorIndex][1] / 255.0f;
   Blue = PALETTE[inTriColorIndex][2] / 255.0f;
-  glColor3f(Red, Green, Blue);
-}
-//색깔을 초기화 하는 함수
-void Color()
-{
-  Red = PALETTE[ColorIndex][0] / 255.0f;
-  Green = PALETTE[ColorIndex][1] / 255.0f;
-  Blue = PALETTE[ColorIndex][2] / 255.0f;
   glColor3f(Red, Green, Blue);
 }
 
@@ -286,7 +278,7 @@ void Draw_Circle()
   int num = 45;
   float delta;
   //glClear(GL_COLOR_BUFFER_BIT);
-  Color();
+  circleColor();
   delta = 2.0 * PI / num;
   glBegin(GL_POLYGON);
   for (int i = 0; i < num; i++)
@@ -298,7 +290,7 @@ void Draw_Circle()
 
 void Draw_Rect()
 {
-  Color();
+  rectColor();
   //glColor3f(255, 255, 255);
 	glBegin(GL_POLYGON);
 	glVertex2f(rx, ry);//왼쪽상단
@@ -309,7 +301,7 @@ void Draw_Rect()
 }
 void Draw_Tri()
 {
-  Color();
+  triColor();
   //glColor3f(255, 255, 255);
   glBegin(GL_TRIANGLES);
   glVertex2f(tx-radiusT, ty-2*radiusT);
@@ -319,7 +311,7 @@ void Draw_Tri()
 }
 void Draw_inTri() //역삼각형
 {
-  Color();
+  inTriColor();
   //glColor3f(255, 255, 255);
   glBegin(GL_TRIANGLES);
   glVertex2f(itx-radiusIT, ity+2*radiusIT);
