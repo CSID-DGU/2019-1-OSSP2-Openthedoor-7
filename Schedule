@@ -43,6 +43,7 @@
 - 점수 체계 도입
 - 코드 함수화, 정리
 - 빨간 얼굴 이벤트
+- socket Communication server & C code 
 
 #6.5
 - 페이스 가이드 라인
@@ -50,6 +51,7 @@
 - 생명 opengl로 그려서 표시
 - 도형 랜덤 모양 날아오기
 - 각 도형 먹으면 없어지는 이벤트
+- login & signup 
 
 FACE TRACKER 남은 할일
 
@@ -64,6 +66,8 @@ FACE TRACKER 남은 할일
 - 시작시에 1,2,3 표시
 
  Server 남은 할일 
-- 소켓 통신 
-- 로그인, 회원가입 먼저 가능하게 
+
 - 게임 시작과 게임 끝에서 점수 가져오기, 업데이트
+- face tracker 와 연동하기
++ 시간 있으면 rank 
+
