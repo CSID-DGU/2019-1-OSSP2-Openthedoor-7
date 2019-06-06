@@ -1,26 +1,31 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <signal.h>
+//#include <signal.h>
 #include <termios.h>
 #include <string.h>
 #include <sys/time.h>
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <iostream>
+
 #include <sys/types.h>
 #include <sys/socket.h>
 
-#include <pthread.h>
-#include <semaphore.h>
+//#include <pthread.h>
+//#include <semaphore.h>
 
 int user_idx;
 
-int score=50;
+int score= 40;
 int first(char * myId, char * myPwd);
 int previousScore();
 void ScoreUpdate();
+int rankGet();
+int firstScoreGet();
 void quit(char * name, int user_idx);
+
 
 int main(int argc, char **argv){
 
@@ -28,9 +33,10 @@ char myId[100];
 char myPwd[100];
 int user_idx = -1;
 user_idx = first(myId, myPwd);
-printf("login complete");
-
+printf("\tlogin complete");
 quit(myId,user_idx);
+
+
 }
 
 
@@ -117,28 +123,31 @@ int first(char * myId, char * myPwd){
 	user_idx = (atoi)(buff);
 	return user_idx;
 }
+
 void quit(char * name, int user_idx)
 {
 
 	char end;
 	int previous_score = -1;
+
 	//tcsetattr(0, TCSANOW, &back_attr); //TCSANOW는 즉시속성을 변경을 의미,
 
 	previous_score = previousScore();
 
-	//printf("%d %d",score, previous_score);
 	if (score > previous_score) {
 		ScoreUpdate();
-		//rank = rankGet();
-		//firstScore = firstScoreGet();
+		int rank = rankGet();
+		int firstScore= firstScoreGet();
 
-		//if (rank != 1) {
-		//	printf("\n\n\t축하합니다. %s님이 최고점수 %d점을 달성했습니다.\n", name, score);
-		//	printf("\n\t당신은 현재 %d등 입니다. 1등의 %d점 도전해보세요! \n\n", rank, firstScore);
-		//}
+		if (rank != 1) {
+			printf("\n\n\t축하합니다. %s님이 최고점수 %d점을 달성했습니다.\n", name, score);
+			printf("\n\t당신은 현재 %d등 입니다. 1등의 %d점 도전해보세요! \n\n", rank, firstScore);
+		}
 		 
+		else{
 			printf("\n\n\t축하합니다. %s님이 최고점수 %d점을 달성했습니다.\n", name, score);
 			printf("\n\t당신은 현재 1등 입니다. 본인의 최고 점수를 갱신해보세요! \n\n");
+		}	
 		
 	}
 	else {
@@ -159,6 +168,7 @@ void quit(char * name, int user_idx)
 
 	return;
 }
+
 int previousScore() {
 	int sock, previous_score;
 	char buff[1000];
@@ -214,4 +224,65 @@ void ScoreUpdate()
 	close(sock);
 }
 
+int rankGet()
+{
+	int sock, rank;
+	char buff[1000];
+	struct sockaddr_in serv_addr;
 
+	sock = socket(PF_INET, SOCK_STREAM, 0);
+	memset(buff, 0x00, sizeof(buff));
+
+	memset(&serv_addr, 0, sizeof(serv_addr));
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr = inet_addr("13.124.167.29");
+	serv_addr.sin_port = htons(3090);
+
+	if (connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) == -1) {
+		//  printf("connect error");
+	}
+	//rank get
+	memset(buff, 0x00, sizeof(buff));
+	sprintf(buff, "%c|%d", '7', user_idx);
+	write(sock, buff, sizeof(buff));
+	//printf("%s\n", buff);
+	memset(buff, 0x00, sizeof(buff));
+	read(sock, buff, sizeof(buff));
+	//printf("%s\n", buff);
+	//printf("my Rank : ");
+	rank = (atoi)(buff)+1;
+	//printf("%c\n",buff[9]);
+	// printf("%d\n", myRank);
+	close(sock);
+	return rank;
+}
+
+
+int firstScoreGet()
+{
+	int sock, first = 0;
+	char buff[1000];
+	struct sockaddr_in serv_addr;
+
+	sock = socket(PF_INET, SOCK_STREAM, 0);
+	memset(buff, 0x00, sizeof(buff));
+
+	memset(&serv_addr, 0, sizeof(serv_addr));
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr = inet_addr("13.124.167.29");
+	serv_addr.sin_port = htons(3090);
+
+	if (connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) == -1) {
+		//printf("connect error");
+	}
+
+	memset(buff, 0x00, sizeof(buff));
+	sprintf(buff, "%c|", '8');
+	write(sock, buff, sizeof(buff));
+	//printf("%s\n", buff);
+	memset(buff, 0x00, sizeof(buff));
+	read(sock, buff, sizeof(buff));
+	//printf("%s\n", buff);
+	first = (atoi)(buff);
+	return first;
+}
