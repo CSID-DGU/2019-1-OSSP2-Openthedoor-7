@@ -100,58 +100,6 @@ var server = net.createServer(function(client){
 				console.log('data : ' + data);
 			}
 		}
-		else if(arr[0] == '3'){
-			//-------------------------------- user_idx로 item 정보 불러오기 (GET)
-			arr = str.split('|',2);
-			console.log('here1');
-			console.log('arr[1]:'+ arr[1]);
-
-			let option = {
-				method : 'GET',
-			}
-			let url = 'http://13.124.167.29:3000/item/' + parseInt(arr[1]);
-			console.log(url);
-			//let result = await request('http://13.209.29.192:3000/item/'+ arr[1].toString());
-			let result = await request(url,option);
-			let data = JSON.parse(result.body).data;
-
-			//console.log(JSON.parse(result.body).item[0].item);
-			//console.log(typeof JSON.parse(result.body).item[0].item);
-
-			if(!result){
-				console.log("No data");
-			} else {
-				client.write(JSON.parse(result.body).item[0].item.toString(),function(err){
-					client.end();
-				});
-				console.log('data : ' + data);
-			}
-
-		}
-		else if(arr[0] == '4'){
-			//------------------------------- user_idx로 item 정보 update 하기 (PUT)
-			arr = str.split('|',3);
-			let option = {
-				method : 'PUT',
-				data: {
-					item : arr[1]
-				}
-			}
-			let url = 'http://13.124.167.29:3000/item/' + parseInt(arr[2]);
-			let result = await request(url,option);
-			let data = JSON.parse(result.body).data;
-
-			if(!result){
-				console.log("No data");
-			} else {
-				client.end();
-				/*
-				client.write(JSON.stringify(JSON.parse(result.body).item),function(err){
-					client.end();
-				});*/
-				console.log('data : ' + data);
-			}
-		}
 		else if(arr[0] == '5'){
 			//-------------------------------- user_idx로 score 정보 불러오기 (GET)
 			arr = str.split('|',2);
