@@ -16,6 +16,10 @@
 //#include <pthread.h>
 //#include <semaphore.h>
 
+#include <curses.h>
+#include <termios.h>
+#include <cstdlib>
+
 int user_idx;
 
 int score= 40;
@@ -25,6 +29,8 @@ void ScoreUpdate();
 int rankGet();
 int firstScoreGet();
 void quit(char * name, int user_idx);
+int mygetch(void);
+void getPwd(char * myPwd);
 
 
 int main(int argc, char **argv){
@@ -37,6 +43,40 @@ printf("\tlogin complete");
 quit(myId,user_idx);
 
 
+}
+
+
+int mygetch(void)
+{
+    struct termios oldt,
+    newt;
+    int ch;
+    tcgetattr( STDIN_FILENO, &oldt );
+    newt = oldt;
+    newt.c_lflag &= ~( ICANON | ECHO );
+    tcsetattr( STDIN_FILENO, TCSANOW, &newt );
+    ch = getchar();
+    tcsetattr( STDIN_FILENO, TCSANOW, &oldt );
+    return ch;
+}
+
+void getPwd(char * myPwd){
+    // get password from console
+    while( std::cin.get() != '\n' );
+    char c = ' ';
+    int i = 0;
+    while (true)
+    {
+        c = (char)mygetch();
+        if (c == 13 || c == 10) break; // \r or \n
+        if (c == 3 || c==26) exit(-1);// ^C or ^Z
+        if (c < 33  || c > 126) continue;//only alphabet char, number and the other characters on the keyboard!
+        // pwd += c;
+        myPwd[i] = c;
+        i++;
+        cout << "*";
+    }
+    cout << endl;
 }
 
 
@@ -62,7 +102,7 @@ int first(char * myId, char * myPwd){
 	scanf("%s", myId);
 
 	printf("\tPW : ");
-	scanf("%s", myPwd);
+	getPwd(myPwd);
 	printf("\n\n");
 
 	while (1) {
