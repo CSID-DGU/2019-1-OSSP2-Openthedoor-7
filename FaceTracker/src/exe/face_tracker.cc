@@ -39,16 +39,69 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <FaceTracker/Tracker.h>
 #include <opencv/highgui.h>
+#include <opencv2/opencv.hpp>
 #include <opencv/cv.h>
 #include <opencv/cxcore.h>
 #include <GL/freeglut.h>
 #include <GL/glut.h>
 #include <GL/glu.h>
 #include <iostream>
+#include <unistd.h>
 #define PI 3.141592
+#define nonMouse "Non MouseEvent"
+#define useMouse "Mouse Event"
 using namespace cv;
 using namespace std;
 
+typedef struct BmpHeader
+{
+  unsigned char HEADER_NAME[2];
+  unsigned char SIZE[4];
+  unsigned int UNUSE1;
+  unsigned int UNUSE2;
+  unsigned long PIXEL_ARRAY_BEGIN;
+
+} BMP_HEADER;
+typedef struct DIBHeader
+{
+  unsigned long DIB_HEADER_SIZE;
+  unsigned long IMAGE_WIDTH;
+  unsigned long IMAGE_HEIGHT;
+  unsigned int PLANE_AMOUNT;
+  unsigned int BITS_PER_PIXEL;
+  unsigned long COMPRESSION_USED;
+  unsigned long PIXEL_ARRAY_SIZE;
+  unsigned long H_RESOLUTION;
+  unsigned long V_RESOLUTION;
+  unsigned long PALETTLE_COLOR;
+  unsigned long IMPORTANT_COLOR;
+} DIB_HEADER;
+typedef struct Color
+{
+  unsigned char B;
+  unsigned char G;
+  unsigned char R;
+} COLOR;
+//typedef struct Column{
+//COLOR *COLUMN_INDEX;
+//unsigned int RowEnding;
+//}COLUMN;
+//typedef struct PixelArray{
+//       COLUMN *ROW_INDEX;
+//}PIXEL_ARRAY;
+typedef struct image
+{
+  BMP_HEADER ImageBMP_HEADER;
+  DIB_HEADER ImageDIB_HEADER;
+  //PIXEL_ARRAY  ImageData;
+
+} IMAGE;
+int Height;
+int Width;
+IMAGE ReadImage;
+COLOR ImageData[600][800];
+int OperatorNumber;
+//================================================
 void warning(Mat &);
 
 int screenW;
@@ -89,28 +142,33 @@ float radius = 5.0;
 int num = 45;
 
 float radius1 = 20.0; //벽돌 반지름
-float radius2 = 25.0;  // 이동하는 공의 반지름
-float radiusR = 50.0;//정사각형 한변길이
-float radiusT = 25.0;//삼각형 높이/2
+float radius2 = 25.0; // 이동하는 공의 반지름
+float radiusR = 50.0; //정사각형 한변길이
+float radiusT = 25.0; //삼각형 높이/2
 float radiusIT = 25.0;
 
 float xp = 40.0;
 float yp = 40.0;
 
 GLfloat xstep;
-GLfloat ystep; // 공의 속도
+GLfloat ystep; // 나머지도형의 속도
+GLfloat Txstep;
+GLfloat Tystep; // 삼각형의 속도
 
-GLfloat cx=-400;
-GLfloat cy=505;
+float defaultXstep = 20;
+float defaultYstep = 20;
 
-GLfloat rx=-690;
-GLfloat ry=25;//정사각형의 왼쪽상단점
+GLfloat cx = -400;
+GLfloat cy = 505;
 
-GLfloat tx=665;
-GLfloat ty=-200;
+GLfloat rx = -690;
+GLfloat ry = 25; //정사각형의 왼쪽상단점
 
-GLfloat itx=-250;
-GLfloat ity=480;
+GLfloat tx = 665;
+GLfloat ty = -200;
+
+GLfloat itx = -250;
+GLfloat ity = 480;
 
 float point_size = 3.0;
 GLenum draw_type;
@@ -118,10 +176,10 @@ GLenum draw_type;
 GLfloat Red, Green, Blue; // glColor3f() 파라미터
 //GLint ColorIndex;         // 색깔을 결정하는 배열 인덱스
 
-GLint circleColorIndex=0;         // 색깔을 결정하는 배열 인덱스
-GLint rectColorIndex=3;
-GLint triColorIndex=5;
-GLint inTriColorIndex=7;
+GLint circleColorIndex = 0; // 색깔을 결정하는 배열 인덱스
+GLint rectColorIndex = 3;
+GLint triColorIndex = 5;
+GLint inTriColorIndex = 7;
 
 unsigned char PALETTE[9][3] = {
     {0, 255, 255}, // CYAN
@@ -134,6 +192,133 @@ unsigned char PALETTE[9][3] = {
     {190, 0, 255}, // Violet
     {0, 0, 0},     // BLACK
 };
+//========================================
+
+int LoadFile(FILE *fptrSet, IMAGE *image)
+{
+  FILE *p;
+  int i;
+  fptrSet = fopen("/home/miranlee/lena512.bmp", "rb");
+  if (fptrSet != NULL)
+  {
+
+    fread(&(image->ImageBMP_HEADER), sizeof(image->ImageBMP_HEADER), 1, fptrSet);
+    fseek(fptrSet, 0x000E, SEEK_SET);
+    fread(&(image->ImageDIB_HEADER), sizeof(image->ImageDIB_HEADER), 1, fptrSet);
+    Width = image->ImageDIB_HEADER.IMAGE_WIDTH;
+    Height = image->ImageDIB_HEADER.IMAGE_HEIGHT;
+    // ImageData=new COLOR[Height];
+    //for(int i=0;i<Height;i++)
+    // ImageData[i]=new COLOR [Width];
+    fseek(fptrSet, 0x0036, SEEK_SET);
+    for (int i = 0; i < Height; i++)
+    {
+      fread(ImageData[i], sizeof(COLOR), Width, fptrSet);
+      //fptrSet+=2;
+    }
+    if (image->ImageBMP_HEADER.HEADER_NAME[0] == 'B' && image->ImageBMP_HEADER.HEADER_NAME[1] == 'M')
+    {
+      printf("The image was loaded!\n");
+      return 0;
+    }
+    else
+    {
+      printf("The image is not bmp!\n");
+      return -1;
+    }
+  }
+  fclose(fptrSet);
+}
+void b_display()
+{
+  float gray;
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  switch (OperatorNumber)
+  {
+  case 0:
+    for (int i = 0; i < Height; i++)
+    {
+      for (int j = 0; j < Width; j++)
+      {
+        glBegin(GL_POINTS);
+        glColor3f((float)ImageData[i][j].R / 255, (float)ImageData[i][j].G / 255, (float)ImageData[i][j].B / 255); //��??�m?��?��
+        glVertex2i(j, i);
+        glEnd();
+      }
+    }
+    break;
+  case 1:
+    for (int i = 0; i < Height; i++)
+    {
+      for (int j = 0; j < Width; j++)
+      {
+        glBegin(GL_POINTS);
+        gray = ((float)ImageData[i][j].R / 255 + (float)ImageData[i][j].G / 255 + (float)ImageData[i][j].B / 255) / 3;
+        glColor3f(gray, gray, gray);
+        glVertex2i(j, i);
+        glEnd();
+      }
+    }
+    break;
+  case 2:
+    for (int i = 0; i < Height; i++)
+    {
+      for (int j = 0; j < Width; j++)
+      {
+        glBegin(GL_POINTS);
+        glColor3f((float)(ImageData[i][j].R ^ 255) / 255, (float)(ImageData[i][j].G ^ 255) / 255, (float)(ImageData[i][j].B ^ 255) / 255);
+        glVertex2i(j, i);
+        glEnd();
+      }
+    }
+    break;
+  }
+
+  glFlush();
+}
+//========================================
+
+// void initTexture(string filename, Point p1, Point p2, Point p3, Point p4) {
+//  //  glClear(GL_COLOR_BUFFER_BIT);
+//  glColor3f(1, 1, 1);
+//  glGenTextures(1, texture);
+//  glBindTexture(GL_TEXTURE_2D, texture[0]);
+//  // set the texture wrapping/filtering options (on the currently bound texture object)
+//  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//  // load and generate the texture
+//  int width, height, nrChannels;
+//  unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
+//  if (data)
+//  {
+//      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+//      //glGenerateMipmap(GL_TEXTURE_2D);
+//  }
+//  else
+//  {
+//      std::cout << "Failed to load texture" << std::endl;
+//  }
+//  glBindTexture(GL_TEXTURE_2D, 0);
+
+//  glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, GL_MODULATE);
+
+//  glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+
+//  glBindTexture(GL_TEXTURE_2D, texture[0]);
+//  glEnable(GL_TEXTURE_2D);
+//  glBegin(GL_QUADS);
+//  glTexCoord2i(0, 0); glVertex2f(p1.x, p1.y);
+//  glTexCoord2i(0, 1); glVertex2f(p2.x, p2.y);
+//  glTexCoord2i(1, 1); glVertex2f(p3.x, p3.y);
+//  glTexCoord2i(1, 0); glVertex2f(p4.x, p4.y);
+//  glEnd();
+//  glDisable(GL_TEXTURE_2D);
+//  glBindTexture(GL_TEXTURE_2D, 0);
+//  stbi_image_free(data);
+// }
 
 //색깔을 초기화 하는 함수
 void circleColor()
@@ -172,16 +357,18 @@ int aSelect()
   return a;
 }
 
-int lSelect(){
+int lSelect()
+{
   srand((unsigned int)time(NULL));
-  int l=rand() % 2;
+  int l = rand() % 2;
   return l;
 }
 
-void draw_life(){
+void draw_life()
+{
 
-  if(life==1){
-     glColor3f(1.0, 0.0, 0.0);
+  if (life == 1)
+  {
     int max = 1200;
     int y = -430;
     glBegin(GL_POLYGON);
@@ -196,8 +383,10 @@ void draw_life(){
     glVertex2i((max / 2) + 30, y + 10); //9
     glVertex2i((max / 2) + 10, y + 10); //10
     glEnd();
-  }else if(life==2){
- glColor3f(1.0, 0.0, 0.0);
+  }
+  else if (life == 2)
+  {
+    glColor3f(1.0, 0.0, 0.0);
     int max = 1200;
     int y = -430;
     glBegin(GL_POLYGON);
@@ -225,8 +414,11 @@ void draw_life(){
     glVertex2i((max / 2) + 30, y + 10); //9
     glVertex2i((max / 2) + 10, y + 10); //10
     glEnd();
-  }else if(life==3){
-     glColor3f(1.0, 0.0, 0.0);
+  }
+  else if (life == 3)
+  {
+
+    glColor3f(1.0, 0.0, 0.0);
     int max = 1200;
     int y = -430;
     glBegin(GL_POLYGON);
@@ -267,11 +459,8 @@ void draw_life(){
     glVertex2i((max / 2) + 30, y + 10); //9
     glVertex2i((max / 2) + 10, y + 10); //10
     glEnd();
-  
   }
-
 }
-
 
 void Draw_Circle()
 {
@@ -292,20 +481,20 @@ void Draw_Rect()
 {
   rectColor();
   //glColor3f(255, 255, 255);
-	glBegin(GL_POLYGON);
-	glVertex2f(rx, ry);//왼쪽상단
-	glVertex2f(rx+radiusR, ry);//오른쪽상단
-	glVertex2f(rx + radiusR, ry + radiusR);//오른쪽하단
-  glVertex2f(rx, ry+ radiusR);//왼쪽하단
-	glEnd();
+  glBegin(GL_POLYGON);
+  glVertex2f(rx, ry);                     //왼쪽상단
+  glVertex2f(rx + radiusR, ry);           //오른쪽상단
+  glVertex2f(rx + radiusR, ry + radiusR); //오른쪽하단
+  glVertex2f(rx, ry + radiusR);           //왼쪽하단
+  glEnd();
 }
 void Draw_Tri()
 {
   triColor();
   //glColor3f(255, 255, 255);
   glBegin(GL_TRIANGLES);
-  glVertex2f(tx-radiusT, ty-2*radiusT);
-  glVertex2f(tx+radiusT, ty-2*radiusT);
+  glVertex2f(tx - radiusT, ty - 2 * radiusT);
+  glVertex2f(tx + radiusT, ty - 2 * radiusT);
   glVertex2f(tx, ty);
   glEnd();
 }
@@ -314,8 +503,8 @@ void Draw_inTri() //역삼각형
   inTriColor();
   //glColor3f(255, 255, 255);
   glBegin(GL_TRIANGLES);
-  glVertex2f(itx-radiusIT, ity+2*radiusIT);
-  glVertex2f(itx+radiusIT, ity+2*radiusIT);
+  glVertex2f(itx - radiusIT, ity + 2 * radiusIT);
+  glVertex2f(itx + radiusIT, ity + 2 * radiusIT);
   glVertex2f(itx, ity);
   glEnd();
 }
@@ -325,50 +514,49 @@ void circleRandom(int a, int l)
   srand((unsigned int)time(NULL));
   //int l=rand() % 2;
   //Draw_Circle();
-   if (a == 0)//원:위/ 네모:왼쪽/세모:오른쪽
-   {
-      srand((unsigned int)time(NULL));
-      if(l=0)//왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
-      {
-        cx=rand()%616-615;
-      }
-      else//오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
-      {
-        cx=rand()%615+1;
+  if (a == 0) //원:위/ 네모:왼쪽/세모:오른쪽
+  {
+    srand((unsigned int)time(NULL));
+    if (l == 0) //왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
+    {
+      cx = rand() % 616 - 615;
+    }
+    else //오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
+    {
+      cx = rand() % 615 + 1;
+    }
+    cy = 505;
+  }
 
-      }
-      cy = 505;
-   }
+  else if (a == 1) //원:왼쪽 / 네모:오른쪽 / 세모:위
+  {
+    srand((unsigned int)time(NULL));
+    cx = -665;
+    if (l == 0) //원:위 / 네모:아래
+    {
+      cy = rand() % 456 - 455;
+    }
+    else //원:아래 / 네모:위
+    {
+      cy = rand() % 455 + 1;
+    }
+  }
 
-   else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
-   {
-      srand((unsigned int)time(NULL));
-      cx = -665;
-      if(l=0)//원:위 / 네모:아래
-      {
-        cy=rand()%456-455;
-      }
-      else//원:아래 / 네모:위
-      {
-        cy=rand()%455+1;
-      }
-   }
+  else //원:오른쪽 / 네모:위 / 세모:왼쪽
+  {
+    srand((unsigned int)time(NULL));
+    cx = 665;
+    if (l == 0) //위쪽 or 왼쪽
+    {
+      cy = rand() % 456 - 455;
+    }
+    else //아래쪽 or 오른쪽
+    {
+      cy = rand() % 455 + 1;
+    }
+  }
 
-   else//원:오른쪽 / 네모:위 / 세모:왼쪽
-   {
-      srand((unsigned int)time(NULL));
-      cx = 665;
-      if(l=0)//위쪽 or 왼쪽
-      {
-        cy=rand()%456-455;
-      }
-      else//아래쪽 or 오른쪽
-      {
-        cy=rand()%455+1;
-      }
-   }
-   
-   Draw_Circle();
+  Draw_Circle();
 }
 
 void rectRandom(int a, int l)
@@ -376,53 +564,53 @@ void rectRandom(int a, int l)
   srand((unsigned int)time(NULL));
   //int l=rand() % 2;
   //Draw_Circle();
-   if (a == 0)//원:위/ 네모:왼쪽/세모:오른쪽
-   {
-      srand((unsigned int)time(NULL));
-      rx=-690;
-      if(l=0)//왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
-      {
-        ry=rand()%431-430;
-        //ry=rand()%406+25;
-      }
-      else//오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
-      {
-        ry=rand()%406+25;
-        //ry=rand()%431-430;
-      }
-   }
+  if (a == 0) //원:위/ 네모:왼쪽/세모:오른쪽
+  {
+    srand((unsigned int)time(NULL));
+    rx = -690;
+    if (l == 0) //왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
+    {
+      ry = rand() % 431 - 430;
+      //ry=rand()%406+25;
+    }
+    else //오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
+    {
+      ry = rand() % 406 + 25;
+      //ry=rand()%431-430;
+    }
+  }
 
-   else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
-   {
-      srand((unsigned int)time(NULL));
-      rx=640;
-      if(l=0)//원:위 / 네모:아래
-      {
-        ry=rand()%431-430;
-        //ry=rand()%406+25;
-      }
-      else//원:아래 / 네모:위
-      {
-        ry=rand()%406+25;
-        //ry=rand()%431-430;
-      }
-   }
+  else if (a == 1) //원:왼쪽 / 네모:오른쪽 / 세모:위
+  {
+    srand((unsigned int)time(NULL));
+    rx = 640;
+    if (l == 0) //원:위 / 네모:아래
+    {
+      ry = rand() % 431 - 430;
+      //ry=rand()%406+25;
+    }
+    else //원:아래 / 네모:위
+    {
+      ry = rand() % 406 + 25;
+      //ry=rand()%431-430;
+    }
+  }
 
-   else//원:오른쪽 / 네모:위 / 세모:왼쪽
-   {
-      srand((unsigned int)time(NULL));
-      if(l=0)//위쪽 or 왼쪽
-      {
-        ry=rand()%591-615;
-      }
-      else//아래쪽 or 오른쪽
-      {
-        ry=rand()%566;
-      }
-      ry=530;
-   }
-   
-   Draw_Rect();
+  else //원:오른쪽 / 네모:위 / 세모:왼쪽
+  {
+    srand((unsigned int)time(NULL));
+    if (l = 0) //위쪽 or 왼쪽
+    {
+      ry = rand() % 591 - 615;
+    }
+    else //아래쪽 or 오른쪽
+    {
+      ry = rand() % 566;
+    }
+    ry = 530;
+  }
+
+  Draw_Rect();
 }
 
 void triRandom(int a, int l)
@@ -430,49 +618,49 @@ void triRandom(int a, int l)
   srand((unsigned int)time(NULL));
   //int l=rand() % 2;
   //Draw_Circle();
-   if (a == 0)//원:위/ 네모:왼쪽/세모:오른쪽
-   {
-      srand((unsigned int)time(NULL));
-      tx=665;
-      if(l=0)//왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
-      {
-        ty=rand()%431+50;
-      }
-      else//오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
-      {
-        ty=rand()%431-430;
-      }
-   }
+  if (a == 0) //원:위/ 네모:왼쪽/세모:오른쪽
+  {
+    srand((unsigned int)time(NULL));
+    tx = 665;
+    if (l == 0) //왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
+    {
+      ty = rand() % 431 + 50;
+    }
+    else //오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
+    {
+      ty = rand() % 431 - 430;
+    }
+  }
 
-   else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
-   {
-      srand((unsigned int)time(NULL));
-      if(l=0)//원:위 / 네모:아래
-      {
-        tx=rand()%566-590;
-      }
-      else//원:아래 / 네모:위
-      {
-        tx=rand()%591;
-      }
-      ty=530;
-   }
+  else if (a == 1) //원:왼쪽 / 네모:오른쪽 / 세모:위
+  {
+    srand((unsigned int)time(NULL));
+    if (l == 0) //원:위 / 네모:아래
+    {
+      tx = rand() % 566 - 590;
+    }
+    else //원:아래 / 네모:위
+    {
+      tx = rand() % 591;
+    }
+    ty = 530;
+  }
 
-   else//원:오른쪽 / 네모:위 / 세모:왼쪽
-   {
-      srand((unsigned int)time(NULL));
-      tx=-665;
-      if(l=0)//위쪽 or 왼쪽
-      {
-        ty=rand()%431+50;
-      }
-      else//아래쪽 or 오른쪽
-      {
-        ty=rand()%431-430;
-      }
-   }
+  else //원:오른쪽 / 네모:위 / 세모:왼쪽
+  {
+    srand((unsigned int)time(NULL));
+    tx = -665;
+    if (l == 0) //위쪽 or 왼쪽
+    {
+      ty = rand() % 431 + 50;
+    }
+    else //아래쪽 or 오른쪽
+    {
+      ty = rand() % 431 - 430;
+    }
+  }
 
-   Draw_Tri();
+  Draw_Tri();
 }
 
 void inTriRandom(int a, int l)
@@ -480,215 +668,253 @@ void inTriRandom(int a, int l)
   srand((unsigned int)time(NULL));
   //int l=rand() % 2;
   //Draw_Circle();
-   if (a == 0)//원:위/ 네모:왼쪽/세모:오른쪽
-   {
-      srand((unsigned int)time(NULL));
-      if(l=0)//왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
-      {
-        itx=rand()%491+50;
-      }
-      else//오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
-      {
-        itx=rand()%541-540;
-      }
-      ity=480;
-   }
+  if (a == 0) //원:위/ 네모:왼쪽/세모:오른쪽
+  {
+    srand((unsigned int)time(NULL));
+    if (l == 0) //왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
+    {
+      itx = rand() % 491 + 50;
+    }
+    else //오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
+    {
+      itx = rand() % 541 - 540;
+    }
+    ity = 480;
+  }
 
-   else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
-   {
-      srand((unsigned int)time(NULL));
-      if(l=0)//왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
-      {
-        itx=rand()%491+50;
-      }
-      else//오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
-      {
-        itx=rand()%541-540;
-      }
-      ity=480;
-   }
+  else if (a == 1) //원:왼쪽 / 네모:오른쪽 / 세모:위
+  {
+    srand((unsigned int)time(NULL));
+    if (l == 0) //왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
+    {
+      itx = rand() % 491 + 50;
+    }
+    else //오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
+    {
+      itx = rand() % 541 - 540;
+    }
+    ity = 480;
+  }
 
-   else//원:오른쪽 / 네모:위 / 세모:왼쪽
-   {
-      srand((unsigned int)time(NULL));
-      if(l=0)//왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
-      {
-        itx=rand()%491+50;
-      }
-      else//오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
-      {
-        itx=rand()%541-540;
-      }
-      ity=480;
-   }
+  else //원:오른쪽 / 네모:위 / 세모:왼쪽
+  {
+    srand((unsigned int)time(NULL));
+    if (l == 0) //왼쪽 / 네모:아래/ 세모:아래/ 역삼각:오른쪽
+    {
+      itx = rand() % 491 + 50;
+    }
+    else //오른쪽 / 네무:위 /세모 : 위 / 역삼각:왼쪽
+    {
+      itx = rand() % 541 - 540;
+    }
+    ity = 480;
+  }
 
-   Draw_inTri();
+  Draw_inTri();
 }
 
 void circleRandomMoving(int a, int l)
-{  
-  srand((unsigned int)time(NULL));
+{
+  /* srand((unsigned int)time(NULL));
   xstep = rand() % 20 + 10;
   srand((unsigned int)time(NULL));
-  ystep = rand() % 20 + 10;
+  ystep = rand() % 20 + 10; */
 
-  if (a == 0)//원:위/ 네모:왼쪽/세모:오른쪽
+  if (a == 0) //원:위
   {
-    if (l == 0)
+    if (l == 0 && cx < 0) //왼쪽
     {
+      /* cx += defaultXstep;
+      cy -= defaultYstep; */
+
       cx += xstep;
-      cy -= ystep;
+      cy -= defaultYstep;
     }
-    else
+    else if (l == 1 && cx >= 0) //오른쪽
     {
+      /* cx-=defaultXstep;
+      cy-=defaultYstep; */
+
       cx -= xstep;
-      cy -= ystep;
-    }
-  }
-  else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
-  {
-    if (l == 0)
-    {
-      cx += xstep;
-      cy -= ystep;
+      cy -= defaultYstep;
     }
     else
+      cy -= defaultYstep;
+  }
+  else if (a == 1) //원:왼쪽
+  {
+    if (l == 0 && cy > 0) //위
     {
-      cx += xstep;
+      /* cx+=defaultXstep;
+      cy-=defaultYstep; */
+
+      cx += defaultXstep;
+      cy -= ystep;
+    }
+    else if (l == 1 && cy <= 0) //아래
+    {
+      /* cx+=defaultXstep;
+      cy+=defaultYstep; */
+
+      cx += defaultXstep;
       cy += ystep;
     }
+    else
+      cx += defaultXstep;
   }
-  else//원:오른쪽 / 네모:위 / 세모:왼쪽
+  else //원:오른쪽 / 네모:위 / 세모:왼쪽
   {
-    if (l == 0)
+    if (l == 0 && cy > 0) //위
     {
-      cx -= xstep;
+      /* cx-=defaultXstep;
+      cy-=defaultYstep; */
+
+      cx -= defaultXstep;
       cy -= ystep;
     }
-    else
+    else if (l == 1 && cy <= 0) //아래
     {
-      cx -= xstep;
+      /* cx-=defaultXstep;
+      cy+=defaultYstep; */
+
+      cx -= defaultXstep;
       cy += ystep;
     }
+    else
+      cx -= defaultXstep;
   }
 }
 
 void rectRandomMoving(int a, int l)
 {
-  srand((unsigned int)time(NULL));
+  /* srand((unsigned int)time(NULL));
   xstep = rand() % 20 + 10;
   srand((unsigned int)time(NULL));
-  ystep = rand() % 20 + 10;
+  ystep = rand() % 20 + 10; */
 
-  if (a == 0)//원:위/ 네모:왼쪽/세모:오른쪽
+  if (a == 0) // 네모:왼쪽
   {
-    if (l == 0)
+    if (l == 0 && ry < 0) //아래
     {
       rx += xstep;
       ry += ystep;
     }
-    else
+    else if (l == 1 && ry >= 0) //위
     {
-      rx += xstep;
+      rx += defaultXstep;
       ry -= ystep;
     }
+    else
+      rx += xstep;
   }
-  else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
+  else if (a == 1) //네모:오른쪽
   {
-    if (l == 0)
+    if (l == 0 && ry < 0) //아래
     {
       rx -= xstep;
       ry += ystep;
     }
-    else
+    else if (l == 1 && ry >= 0) //위
     {
       rx -= xstep;
       ry -= ystep;
     }
+    else
+      rx -= xstep;
   }
-  else//원:오른쪽 / 네모:위 / 세모:왼쪽
+  else // 네모:위
   {
-    if (l == 0)
+    if (l == 0 && rx < 0) // 왼쪽
     {
       rx += xstep;
       ry -= ystep;
     }
-    else
+    else if (l == 1 && rx >= 0) //오른쪽
     {
       rx -= xstep;
       ry -= ystep;
     }
+    else
+      ry -= ystep;
   }
 }
 
 void triRandomMoving(int a, int l)
 {
-  srand((unsigned int)time(NULL));
+  /* srand((unsigned int)time(NULL));
   xstep = rand() % 20 + 10;
   srand((unsigned int)time(NULL));
-  ystep = rand() % 20 + 10;
+  ystep = rand() % 20 + 10; */
 
-  if (a == 0)//원:위/ 네모:왼쪽/세모:오른쪽
+  if (a == 0) //삼각형:오른쪽
   {
-    if (l == 0)
+    if (l == 0 && ty > 0) //위
     {
-      tx-= xstep;
-      ty-= ystep;
+      tx -= Txstep;
+      ty -= Tystep;
+    }
+    else if (l == 1 && ty <= 0) //아래
+    {
+      tx -= Txstep;
+      ty += Tystep;
     }
     else
-    {
-      tx-= xstep;
-      ty+= ystep;
-    }
+      tx -= Txstep;
   }
-  else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
+  else if (a == 1) //삼각형:위
   {
-    if (l == 0)
+    if (l == 0 && tx < 0) //왼
     {
-      tx+= xstep;
-      ty-= ystep;
+      tx += Txstep;
+      ty -= Tystep;
+    }
+    else if (l == 1 && tx >= 0) //오
+    {
+      tx -= Txstep;
+      ty -= Tystep;
     }
     else
-    {
-      tx-= xstep;
-      ty-= ystep;
-    }
+      ty -= Tystep;
   }
-  else//원:오른쪽 / 네모:위 / 세모:왼쪽
+  else //삼각형:왼쪽
   {
-    if (l == 0)
+    if (l == 0 && ty > 0) //위
     {
-      tx+= xstep;
-      ty-= ystep;
+      tx += Txstep;
+      ty -= Tystep;
+    }
+    else if (l == 1 && ty <= 0) //아래
+    {
+      tx += Txstep;
+      ty += Tystep;
     }
     else
-    {
-      tx+= xstep;
-      ty+= ystep;
-    }
+      tx += Txstep;
   }
 }
 
 void inTriRandomMoving(int a, int l)
 {
-  srand((unsigned int)time(NULL));
+  /* srand((unsigned int)time(NULL));
   xstep = rand() % 20 + 10;
   srand((unsigned int)time(NULL));
-  ystep = rand() % 20 + 10;
+  ystep = rand() % 20 + 10; */
 
-  if (a == 0)//원:위/ 네모:왼쪽/세모:오른쪽
+  /* if (a == 0)//원:위/ 네모:왼쪽/세모:오른쪽
+  { */
+  if (l == 0 && itx > 0) //오른쪽
   {
-    if (l == 0)
-    {
-      itx-=xstep;
-      ity-=ystep;
-    }
-    else
-    {
-      itx+=xstep;
-      ity-=ystep;
-    }
+    itx -= xstep;
+    ity -= ystep;
   }
+  else if (l == 1 && itx <= 0) //왼쪽
+  {
+    itx += xstep;
+    ity -= ystep;
+  }
+  else
+    ity -= ystep;
+  /* }
   else if (a == 1)//원:왼쪽 / 네모:오른쪽 / 세모:위
   {
     if (l == 0)
@@ -714,7 +940,7 @@ void inTriRandomMoving(int a, int l)
       itx+=xstep;
       ity-=ystep;
     }
-  }
+  } */
 }
 
 void CVtoGL()
@@ -786,7 +1012,7 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
     //
     p1 = cv::Point(shape.at<double>(i, 0), shape.at<double>(i + n, 0));
     c = CV_RGB(255, 0, 0); //빨간 원
-   // cv::circle(image, p1, 2, c);
+                           // cv::circle(image, p1, 2, c);
     //cv::putText(image,std::to_string(i),p1,CV_FONT_HERSHEY_COMPLEX,0.5,c); //인덱싱
 
     if (i <= 26)
@@ -807,7 +1033,7 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
   c = CV_RGB(255, 0, 0);
   cv::fillConvexPoly(image, pts, 6, c);
 
-    warning(image);
+  warning(image);
 
   return;
 }
@@ -973,28 +1199,29 @@ void desLife()
   if (life == 0)
   {
 
-    im.copyTo(copy);//추가
+    im.copyTo(copy); //추가
     fillConvexPoly(copy, facePts, 27, cc);
-    addWeighted(copy, alpha, im, 1 - alpha, 0, im);//추가
+    addWeighted(copy, alpha, im, 1 - alpha, 0, im); //추가
     //sleep(1000);
     exit(0);
   }
 }
 
-void warning(Mat &image){
+void warning(Mat &image)
+{
 
- cv::Scalar cc(0, 0, 255);
+  cv::Scalar cc(0, 0, 255);
   double alpha = 0.5;
 
-    if (facePts[0].x < 40 || facePts[20].y < 40 || facePts[16].x > 600 || facePts[8].y > 440) //입안에 들어왔을 때
+  if (facePts[0].x < 40 || facePts[20].y < 40 || facePts[16].x > 600 || facePts[8].y > 440) //입안에 들어왔을 때
   {
-    cv::Mat roi = image(cv::Rect(40, 40, 560, 400));
+    cv::Mat roi = image(cv::Rect(40, 40, 600, 440));
     cv::Mat color(roi.size(), CV_8UC3, cv::Scalar(0, 0, 255));
     double alpha = 0.3;
     cv::addWeighted(color, alpha, roi, 1.0 - alpha, 0.0, roi);
+    model->FrameReset();
   }
 }
-
 
 void display()
 {
@@ -1016,86 +1243,74 @@ void display()
   float deltaX = xp - cx;
   float deltaY = yp - cy;
 
-  int a=aSelect();
-  int l=lSelect();
+  int a = aSelect();
+  int l = lSelect();
 
-if (xPts[0] <= cx && xPts[2] >= cx && cy <= yPts[2] && cy >= yPts[3]) //입안에 들어왔을 때
-  {
-    cx = 990;
-    cy = 990;
+  if (xPts[0] < cx && xPts[2] > cx && cy < yPts[2] && cy > yPts[3]) //입안에 들어왔을 때
+  {                                                                 //원 먹었을 때
     radius2 = 0;
     score += 10;
   }
-  if (xPts[0] < (rx + 25) && xPts[2] > (rx + 25) && (ry + 25) < yPts[2] && (ry + 25) > yPts[3]) //입안에 들어왔을 때
-  {                                                                                             //사각형 먹었을 때
-    rx = 990;
-    ry = 990;
+  else if (xPts[0] < (rx + 25) && xPts[2] > (rx + 25) && (ry + 25) < yPts[2] && (ry + 25) > yPts[3]) //입안에 들어왔을 때
+  {                                                                                                  //사각형 먹었을 때
     radiusR = 0;
     score += 10;
   }
   else if (xPts[0] < tx && xPts[2] > tx && (ty + 25) < yPts[2] && (ty + 25) > yPts[3]) //입안에 들어왔을 때
   {                                                                                    //삼각형 (생명++)
-    if (life < 3)
-    {
-      life++;
-    }
-    tx = 990;
-    ty = 990;
     radiusT = 0;
     score += 10;
   }
   else if (xPts[0] < itx && xPts[2] > itx && (ity + 25) < yPts[2] && (ity + 25) > yPts[3]) //입안에 들어왔을 때
   {                                                                                        //역삼각형 생명 --
-    itx = 990;
-    ity = 990;
     radiusIT = 0;
     desLife();
   }
-  
- /////////원 충돌 확인///////////////////////
- if(cx + radius2 > 690)
- {
-   radius2 = NULL;
-   radius2 = 25.0;
-   if (circleColorIndex >= 8)
-      circleColorIndex = 0;
-   else
-      circleColorIndex = circleColorIndex + 1;
-   circleRandom(a,l);
- }
- if(cx - radius2 < -690)
- {
-   radius2 = NULL;
-   radius2 = 25.0;
-   if (circleColorIndex >= 8)
-      circleColorIndex = 0;
-   else
-      circleColorIndex = circleColorIndex + 1;
-   circleRandom(a,l);
- }
- if(cy - radius2 < -530)
- {
-   radius2 = NULL;
-   radius2 = 25.0;
-   if (circleColorIndex >= 8)
-      circleColorIndex = 0;
-   else
-      circleColorIndex = circleColorIndex + 1;
-   circleRandom(a,l);
- }
- if(cy + radius2 > 530)
- {
-   radius2 = NULL;
-   radius2 = 25.0;
-   if (circleColorIndex >= 8)
-      circleColorIndex = 0;
-   else
-      circleColorIndex = circleColorIndex + 1;
-   circleRandom(a,l);
- }
 
-////////사각형 충돌 확인////////////////////////////////////
-  if(rx+radiusR >700)//오
+  /////////원 충돌 확인///////////////////////
+  if (cx + radius2 > 690)
+  {
+    radius2 = NULL;
+    radius2 = 25.0;
+    if (circleColorIndex >= 8)
+      circleColorIndex = 0;
+    else
+      circleColorIndex = circleColorIndex + 1;
+    circleRandom(a, l);
+  }
+  if (cx - radius2 < -690)
+  {
+    radius2 = NULL;
+    radius2 = 25.0;
+    if (circleColorIndex >= 8)
+      circleColorIndex = 0;
+    else
+      circleColorIndex = circleColorIndex + 1;
+    circleRandom(a, l);
+  }
+  if (cy - radius2 < -530)
+  {
+    radius2 = NULL;
+    radius2 = 25.0;
+    if (circleColorIndex >= 8)
+      circleColorIndex = 0;
+    else
+      circleColorIndex = circleColorIndex + 1;
+    circleRandom(a, l);
+  }
+  if (cy + radius2 > 530)
+  {
+    radius2 = NULL;
+    radius2 = 25.0;
+    if (circleColorIndex >= 8)
+      circleColorIndex = 0;
+    else
+      circleColorIndex = circleColorIndex + 1;
+    circleRandom(a, l);
+  }
+
+  ////////사각형 충돌 확인////////////////////////////////////
+  if (rx + radiusR > 700) //오
   {
     radiusR = NULL;
     radiusR = 50.0;
@@ -1103,9 +1318,9 @@ if (xPts[0] <= cx && xPts[2] >= cx && cy <= yPts[2] && cy >= yPts[3]) //입안�
       rectColorIndex = 0;
     else
       rectColorIndex = rectColorIndex + 1;
-    rectRandom(a,l);
+    rectRandom(a, l);
   }
-  if(rx<-700)//왼
+  if (rx < -700) //왼
   {
     radiusR = NULL;
     radiusR = 50.0;
@@ -1113,9 +1328,9 @@ if (xPts[0] <= cx && xPts[2] >= cx && cy <= yPts[2] && cy >= yPts[3]) //입안�
       rectColorIndex = 0;
     else
       rectColorIndex = rectColorIndex + 1;
-    rectRandom(a,l);
+    rectRandom(a, l);
   }
-  if(ry-radiusR < -530)//바닥
+  if (ry - radiusR < -530) //바닥
   {
     radiusR = NULL;
     radiusR = 50.0;
@@ -1123,9 +1338,9 @@ if (xPts[0] <= cx && xPts[2] >= cx && cy <= yPts[2] && cy >= yPts[3]) //입안�
       rectColorIndex = 0;
     else
       rectColorIndex = rectColorIndex + 1;
-    rectRandom(a,l);
+    rectRandom(a, l);
   }
-  if(ry > 530)//천장
+  if (ry > 530) //천장
   {
     radiusR = NULL;
     radiusR = 50.0;
@@ -1133,26 +1348,12 @@ if (xPts[0] <= cx && xPts[2] >= cx && cy <= yPts[2] && cy >= yPts[3]) //입안�
       rectColorIndex = 0;
     else
       rectColorIndex = rectColorIndex + 1;
-    rectRandom(a,l);
+    rectRandom(a, l);
   }
-  
-////////////삼각형 충돌 확인///////////////////////////////////////////////////
- if (tx>690)
-  {                 //오른쪽벽과의 충돌여부
-    radiusT = NULL;
-    radiusT = 25.0;
-    
-    if (triColorIndex >= 8)
-      triColorIndex = 0;
-    else
-      triColorIndex = triColorIndex + 1;
- 
-    triRandom(a,l);
-    
-  }
- 
-  if (tx<-690)//cx - radius2 < -690 && 
-  { //왼쪽벽
+
+  ////////////삼각형 충돌 확인///////////////////////////////////////////////////
+  if (tx > 690)
+  { //오른쪽벽과의 충돌여부
     radiusT = NULL;
     radiusT = 25.0;
 
@@ -1161,25 +1362,11 @@ if (xPts[0] <= cx && xPts[2] >= cx && cy <= yPts[2] && cy >= yPts[3]) //입안�
     else
       triColorIndex = triColorIndex + 1;
 
-   triRandom(a,l);
-    
+    triRandom(a, l);
   }
 
-  if (ty<-550)//cy - radius2 < -530 && 
-  { //바닥
-    radiusT = NULL;
-    radiusT = 25.0;;
-
-    if (triColorIndex >= 8)
-      triColorIndex = 0;
-    else
-      triColorIndex = triColorIndex + 1;
-    triRandom(a,l);
-    
-  }
-
-  if (ty>550) //cy + radius2 > 530&&
-  { //천장
+  if (tx < -690) //cx - radius2 < -690 &&
+  {              //왼쪽벽
     radiusT = NULL;
     radiusT = 25.0;
 
@@ -1187,12 +1374,37 @@ if (xPts[0] <= cx && xPts[2] >= cx && cy <= yPts[2] && cy >= yPts[3]) //입안�
       triColorIndex = 0;
     else
       triColorIndex = triColorIndex + 1;
-    triRandom(a,l);
-    
+
+    triRandom(a, l);
   }
 
-/////////역삼각형 충돌 확인////////////////////////////////
-  if(itx>690)
+  if (ty < -550) //cy - radius2 < -530 &&
+  {              //바닥
+    radiusT = NULL;
+    radiusT = 25.0;
+    ;
+
+    if (triColorIndex >= 8)
+      triColorIndex = 0;
+    else
+      triColorIndex = triColorIndex + 1;
+    triRandom(a, l);
+  }
+
+  if (ty > 550) //cy + radius2 > 530&&
+  {             //천장
+    radiusT = NULL;
+    radiusT = 25.0;
+
+    if (triColorIndex >= 8)
+      triColorIndex = 0;
+    else
+      triColorIndex = triColorIndex + 1;
+    triRandom(a, l);
+  }
+
+  /////////역삼각형 충돌 확인////////////////////////////////
+  if (itx > 690)
   {
     radiusIT = NULL;
     radiusIT = 25.0;
@@ -1201,11 +1413,11 @@ if (xPts[0] <= cx && xPts[2] >= cx && cy <= yPts[2] && cy >= yPts[3]) //입안�
       inTriColorIndex = 0;
     else
       inTriColorIndex = inTriColorIndex + 1;
-    
-    inTriRandom(a,l);
+
+    inTriRandom(a, l);
   }
 
-  if(itx<-690)
+  if (itx < -690)
   {
     radiusIT = NULL;
     radiusIT = 25.0;
@@ -1214,11 +1426,11 @@ if (xPts[0] <= cx && xPts[2] >= cx && cy <= yPts[2] && cy >= yPts[3]) //입안�
       inTriColorIndex = 0;
     else
       inTriColorIndex = inTriColorIndex + 1;
-    
-    inTriRandom(a,l);
+
+    inTriRandom(a, l);
   }
 
-  if(ity<-550)
+  if (ity < -550)
   {
     radiusIT = NULL;
     radiusIT = 25.0;
@@ -1227,11 +1439,11 @@ if (xPts[0] <= cx && xPts[2] >= cx && cy <= yPts[2] && cy >= yPts[3]) //입안�
       inTriColorIndex = 0;
     else
       inTriColorIndex = inTriColorIndex + 1;
-    
-    inTriRandom(a,l);
+
+    inTriRandom(a, l);
   }
 
-  if(itx>690)
+  if (itx > 690)
   {
     radiusIT = NULL;
     radiusIT = 25.0;
@@ -1240,14 +1452,50 @@ if (xPts[0] <= cx && xPts[2] >= cx && cy <= yPts[2] && cy >= yPts[3]) //입안�
       inTriColorIndex = 0;
     else
       inTriColorIndex = inTriColorIndex + 1;
-    
-    inTriRandom(a,l);
+
+    inTriRandom(a, l);
   }
 
-  circleRandomMoving(a,l);
-  rectRandomMoving(a,l);
-  triRandomMoving(a,l);
-  inTriRandomMoving(a,l);
+  /////점수에 따라 도형 속도 증가//////////////////
+  srand((unsigned int)time(NULL));
+  xstep = rand() % 30 + 20;
+  Txstep = rand() % 30 + 100;
+  srand((unsigned int)time(NULL));
+  ystep = rand() % 20 + 10;
+  Tystep = rand() % 30 + 100;
+
+  if (score >= 50 && score < 100)
+  {
+    srand((unsigned int)time(NULL));
+    xstep = rand() % 40 + 50;
+    srand((unsigned int)time(NULL));
+    ystep = rand() % 40 + 40;
+  }
+  if (score >= 100 && score < 150)
+  {
+    srand((unsigned int)time(NULL));
+    xstep = rand() % 25 + 90;
+    srand((unsigned int)time(NULL));
+    ystep = rand() % 25 + 90;
+  }
+  if (score >= 150 && score < 200)
+  {
+    srand((unsigned int)time(NULL));
+    xstep = rand() % 30 + 110;
+    srand((unsigned int)time(NULL));
+    ystep = rand() % 30 + 110;
+  }
+  if (score >= 200)
+  {
+    srand((unsigned int)time(NULL));
+    xstep = rand() % 40 + 140;
+    srand((unsigned int)time(NULL));
+    ystep = rand() % 40 + 140;
+  }
+  circleRandomMoving(a, l);
+  rectRandomMoving(a, l);
+  triRandomMoving(a, l);
+  inTriRandomMoving(a, l);
 
   Draw_Circle();
   Draw_Rect();
@@ -1276,7 +1524,7 @@ void faceCam()
   char sss[256];
   char vvv[256];
   char ooo[256];
- Scalar c = CV_RGB(255, 0, 0);
+  Scalar c = CV_RGB(255, 0, 0);
   double fps = 0;
   int fnum = 0;
   Mat frame, gray;
@@ -1340,8 +1588,8 @@ void faceCam()
     putText(im, text, cv::Point(10, 20), CV_FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(255, 255, 255));
     putText(im, dynamic_score, cv::Point(440, 30), CV_FONT_HERSHEY_SIMPLEX, 0.8, CV_RGB(0, 0, 0), 2);
     //putText(im, nowLife, cv::Point(500, 470), CV_FONT_HERSHEY_SIMPLEX, 1.0, CV_RGB(0, 0, 0), 2);
- rectangle(im, Point(40, 40), Point(600, 440), c, 3);
- }
+    rectangle(im, Point(40, 40), Point(600, 440), c, 3);
+  }
 }
 void timer(int value)
 {
@@ -1374,9 +1622,10 @@ void keyboard(unsigned char key, int x, int y)
   }
 }
 
-//--------------------------------------------------------------------------
-int main(int argc, char **argv)
+int startGame()
 {
+  int argc = 0;
+  char **argv = 0;
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
   //parse command line arguments
@@ -1417,7 +1666,7 @@ int main(int argc, char **argv)
 
   glutInitWindowSize(screenW, screenH);
   //glutInitWindowPosition(100, 100);
-  glutInitWindowPosition(0, 0);
+  //glutInitWindowPosition(0, 0);
 
   glutCreateWindow("OpenGL");
   init();
@@ -1445,6 +1694,111 @@ int main(int argc, char **argv)
   //imshow("Face Tracker",im); //생성된 창에 카메라 화면 띄움
 
   glutMainLoop();
+}
+
+void ruleMouseEvent(int event, int x, int y, int flags, void *i)
+{
+  int rule_page = *(int *)i;
+
+  if (event == CV_EVENT_LBUTTONDOWN)
+  {
+    if (x > 500) //다음으로 넘기기
+    {
+      if (rule_page == 1)
+      {
+        rule_page = 2;
+        Mat nextPage = imread("/home/miranlee/FaceTracker/image/rule2.bmp", CV_LOAD_IMAGE_COLOR);
+        imshow("GAME RULE", nextPage);
+        waitKey(1);
+        cout<<rule_page;
+      }
+      else if (rule_page == 2)
+      {
+        rule_page = 3;
+        Mat nextPage = imread("/home/miranlee/FaceTracker/image/rule3.bmp", CV_LOAD_IMAGE_COLOR);
+        imshow("GAME RULE", nextPage);
+        waitKey(1);        
+        cout<<rule_page;
+      }
+    }
+    else if (x < 100)
+    {
+      if (rule_page == 2)
+      {
+        rule_page = 1;
+        Mat nextPage = imread("/home/miranlee/FaceTracker/image/rule1.bmp", CV_LOAD_IMAGE_COLOR);
+        imshow("GAME RULE", nextPage);
+        waitKey(1);        
+      }
+      else if (rule_page == 3)
+      {
+        rule_page = 2;
+        Mat nextPage = imread("/home/miranlee/FaceTracker/image/rule2.bmp", CV_LOAD_IMAGE_COLOR);
+        imshow("GAME RULE", nextPage);
+        waitKey(1);        
+      }
+    }
+  }
+}
+void gameRule()
+{
+   namedWindow("GAME RULE", WINDOW_AUTOSIZE);
+
+  Mat image = cv::imread("/home/miranlee/FaceTracker/image/rule1.bmp", CV_LOAD_IMAGE_COLOR);
+  int rule_page = 1;
+  setMouseCallback("GAME RULE", ruleMouseEvent, (void *)&rule_page);
+
+  imshow("GAME RULE", image);
+
+  waitKey(0);
+}
+
+void onMouseEvent(int event, int x, int y, int flags, void *i = 0)
+{
+
+  if (event == CV_EVENT_LBUTTONDOWN)
+  {
+    if (x > 151 && x < 300 && y > 247 && y < 299)
+    { //start
+      Mat push_button = imread("/home/miranlee/FaceTracker/image/start_push.bmp", CV_LOAD_IMAGE_COLOR);
+      imshow("YAM-YAM", push_button);
+      waitKey(1);
+      startGame();
+    }
+    else if (x > 345 && x < 491 && y > 247 && y < 299) //rule
+    {
+      Mat push_button = imread("/home/miranlee/FaceTracker/image/rule_push.bmp", CV_LOAD_IMAGE_COLOR);
+      imshow("YAM-YAM", push_button);
+      waitKey(1);
+      gameRule();
+    }
+    else if (x > 151 && x < 300 && y > 350 && y < 410)
+    { //rank
+      cout << "rank" << endl;
+    }
+    else if (x > 345 && x < 491 && y > 350 && y < 410)
+    { //exit
+      cout << "exit" << endl;
+    }
+  }
+}
+//--------------------------------------------------------------------------
+int main(int argc, char **argv)
+{
+  Mat image = cv::imread("/home/miranlee/FaceTracker/image/인트로.png", CV_LOAD_IMAGE_COLOR);
+  if (image.empty())
+  {
+    cout << "Could not open or find the image" << endl;
+    return -1;
+  }
+
+  namedWindow("YAM-YAM", WINDOW_AUTOSIZE);
+
+  setMouseCallback("YAM-YAM", onMouseEvent);
+
+  imshow("YAM-YAM", image);
+
+  waitKey(0);
 
   return 0;
 }
