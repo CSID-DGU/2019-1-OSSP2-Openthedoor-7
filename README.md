@@ -1,5 +1,9 @@
 # 2019-1-OSSP2-Openthedoor-7
-### game program using face tracker
+
+### Face Tracker 와 Node.js를 이용한 게임 개발
+Open cv를 이용한 오픈소스 Face Tracker를 이용한 게임 개발    
+
+Node.js, AWS, RDS를 이용한 서버 및 DB 구축 
 
 # 오픈소스 출처
 FaceTracker
@@ -29,3 +33,14 @@ $ make   # 옵션을 추가해서 빌드시 에러 발생
 $ cd bin
 $ ./face_tracker
 </pre>
+
+# 팀원
+김예지
+
+김혜지
+
+신소희
+
+이미란
+
+### 디렉토리 구조 
