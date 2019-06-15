@@ -47,61 +47,46 @@
 #include <GL/glu.h>
 #include <iostream>
 #include <unistd.h>
+//-------------------------------------
+#include <stdlib.h>
+#include <stdio.h>
+#include <termios.h>
+#include <string.h>
+#include <sys/time.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+//#include <curses.h>
+#include <termios.h>
+#include <cstdlib>
+
+int first(char * myId, char * myPwd, int flag);
+
+int previousScore();
+
+void ScoreUpdate();
+
+int rankGet();
+
+int firstScoreGet();
+
+void quit(char * name, int user_idx);
+
+int mygetch(void);
+
+void getPwd(char * myPwd);
+
+
+char myId[100];
+//================
 #define PI 3.141592
-#define nonMouse "Non MouseEvent"
-#define useMouse "Mouse Event"
+
 using namespace cv;
 using namespace std;
-
-typedef struct BmpHeader
-{
-  unsigned char HEADER_NAME[2];
-  unsigned char SIZE[4];
-  unsigned int UNUSE1;
-  unsigned int UNUSE2;
-  unsigned long PIXEL_ARRAY_BEGIN;
-
-} BMP_HEADER;
-typedef struct DIBHeader
-{
-  unsigned long DIB_HEADER_SIZE;
-  unsigned long IMAGE_WIDTH;
-  unsigned long IMAGE_HEIGHT;
-  unsigned int PLANE_AMOUNT;
-  unsigned int BITS_PER_PIXEL;
-  unsigned long COMPRESSION_USED;
-  unsigned long PIXEL_ARRAY_SIZE;
-  unsigned long H_RESOLUTION;
-  unsigned long V_RESOLUTION;
-  unsigned long PALETTLE_COLOR;
-  unsigned long IMPORTANT_COLOR;
-} DIB_HEADER;
-typedef struct Color
-{
-  unsigned char B;
-  unsigned char G;
-  unsigned char R;
-} COLOR;
-//typedef struct Column{
-//COLOR *COLUMN_INDEX;
-//unsigned int RowEnding;
-//}COLUMN;
-//typedef struct PixelArray{
-//       COLUMN *ROW_INDEX;
-//}PIXEL_ARRAY;
-typedef struct image
-{
-  BMP_HEADER ImageBMP_HEADER;
-  DIB_HEADER ImageDIB_HEADER;
-  //PIXEL_ARRAY  ImageData;
-
-} IMAGE;
-int Height;
-int Width;
-IMAGE ReadImage;
-COLOR ImageData[600][800];
-int OperatorNumber;
 //================================================
+
+int user_idx;
+
 void warning(Mat &);
 
 int screenW;
@@ -193,132 +178,6 @@ unsigned char PALETTE[9][3] = {
     {0, 0, 0},     // BLACK
 };
 //========================================
-
-int LoadFile(FILE *fptrSet, IMAGE *image)
-{
-  FILE *p;
-  int i;
-  fptrSet = fopen("/home/miranlee/lena512.bmp", "rb");
-  if (fptrSet != NULL)
-  {
-
-    fread(&(image->ImageBMP_HEADER), sizeof(image->ImageBMP_HEADER), 1, fptrSet);
-    fseek(fptrSet, 0x000E, SEEK_SET);
-    fread(&(image->ImageDIB_HEADER), sizeof(image->ImageDIB_HEADER), 1, fptrSet);
-    Width = image->ImageDIB_HEADER.IMAGE_WIDTH;
-    Height = image->ImageDIB_HEADER.IMAGE_HEIGHT;
-    // ImageData=new COLOR[Height];
-    //for(int i=0;i<Height;i++)
-    // ImageData[i]=new COLOR [Width];
-    fseek(fptrSet, 0x0036, SEEK_SET);
-    for (int i = 0; i < Height; i++)
-    {
-      fread(ImageData[i], sizeof(COLOR), Width, fptrSet);
-      //fptrSet+=2;
-    }
-    if (image->ImageBMP_HEADER.HEADER_NAME[0] == 'B' && image->ImageBMP_HEADER.HEADER_NAME[1] == 'M')
-    {
-      printf("The image was loaded!\n");
-      return 0;
-    }
-    else
-    {
-      printf("The image is not bmp!\n");
-      return -1;
-    }
-  }
-  fclose(fptrSet);
-}
-void b_display()
-{
-  float gray;
-  glClear(GL_COLOR_BUFFER_BIT);
-
-  switch (OperatorNumber)
-  {
-  case 0:
-    for (int i = 0; i < Height; i++)
-    {
-      for (int j = 0; j < Width; j++)
-      {
-        glBegin(GL_POINTS);
-        glColor3f((float)ImageData[i][j].R / 255, (float)ImageData[i][j].G / 255, (float)ImageData[i][j].B / 255); //��??�m?��?��
-        glVertex2i(j, i);
-        glEnd();
-      }
-    }
-    break;
-  case 1:
-    for (int i = 0; i < Height; i++)
-    {
-      for (int j = 0; j < Width; j++)
-      {
-        glBegin(GL_POINTS);
-        gray = ((float)ImageData[i][j].R / 255 + (float)ImageData[i][j].G / 255 + (float)ImageData[i][j].B / 255) / 3;
-        glColor3f(gray, gray, gray);
-        glVertex2i(j, i);
-        glEnd();
-      }
-    }
-    break;
-  case 2:
-    for (int i = 0; i < Height; i++)
-    {
-      for (int j = 0; j < Width; j++)
-      {
-        glBegin(GL_POINTS);
-        glColor3f((float)(ImageData[i][j].R ^ 255) / 255, (float)(ImageData[i][j].G ^ 255) / 255, (float)(ImageData[i][j].B ^ 255) / 255);
-        glVertex2i(j, i);
-        glEnd();
-      }
-    }
-    break;
-  }
-
-  glFlush();
-}
-//========================================
-
-// void initTexture(string filename, Point p1, Point p2, Point p3, Point p4) {
-//  //  glClear(GL_COLOR_BUFFER_BIT);
-//  glColor3f(1, 1, 1);
-//  glGenTextures(1, texture);
-//  glBindTexture(GL_TEXTURE_2D, texture[0]);
-//  // set the texture wrapping/filtering options (on the currently bound texture object)
-//  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//  // load and generate the texture
-//  int width, height, nrChannels;
-//  unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
-//  if (data)
-//  {
-//      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-//      //glGenerateMipmap(GL_TEXTURE_2D);
-//  }
-//  else
-//  {
-//      std::cout << "Failed to load texture" << std::endl;
-//  }
-//  glBindTexture(GL_TEXTURE_2D, 0);
-
-//  glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, GL_MODULATE);
-
-//  glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
-
-//  glBindTexture(GL_TEXTURE_2D, texture[0]);
-//  glEnable(GL_TEXTURE_2D);
-//  glBegin(GL_QUADS);
-//  glTexCoord2i(0, 0); glVertex2f(p1.x, p1.y);
-//  glTexCoord2i(0, 1); glVertex2f(p2.x, p2.y);
-//  glTexCoord2i(1, 1); glVertex2f(p3.x, p3.y);
-//  glTexCoord2i(1, 0); glVertex2f(p4.x, p4.y);
-//  glEnd();
-//  glDisable(GL_TEXTURE_2D);
-//  glBindTexture(GL_TEXTURE_2D, 0);
-//  stbi_image_free(data);
-// }
 
 //색깔을 초기화 하는 함수
 void circleColor()
@@ -1203,7 +1062,9 @@ void desLife()
     fillConvexPoly(copy, facePts, 27, cc);
     addWeighted(copy, alpha, im, 1 - alpha, 0, im); //추가
     //sleep(1000);
-    exit(0);
+    //exit(0);
+    glutLeaveMainLoop();
+
   }
 }
 
@@ -1517,6 +1378,703 @@ void reshape(GLsizei width, GLsizei height)
   gluOrtho2D(-640, 640, -480, 480);
 }
 
+int mygetch(void)
+
+{
+
+    struct termios oldt,
+
+    newt;
+
+    int ch;
+
+    tcgetattr( STDIN_FILENO, &oldt );
+
+    newt = oldt;
+
+    newt.c_lflag &= ~( ICANON | ECHO );
+
+    tcsetattr( STDIN_FILENO, TCSANOW, &newt );
+
+    ch = getchar();
+
+    tcsetattr( STDIN_FILENO, TCSANOW, &oldt );
+
+    return ch;
+
+}
+
+ 
+
+void getPwd(char * myPwd){
+
+    // get password from console
+
+    while( std::cin.get() != '\n' );
+
+    char c = ' ';
+
+    int i = 0;
+
+    while (true)
+
+    {
+
+        c = (char)mygetch();
+
+        if (c == 13 || c == 10) break; // \r or \n
+
+        if (c == 3 || c==26) exit(-1);// ^C or ^Z
+
+        if (c < 33  || c > 126) continue;//only alphabet char, number and the other characters on the keyboard!
+
+        // pwd += c;
+
+        myPwd[i] = c;
+
+        i++;
+
+        printf("*");
+
+    }
+
+    printf("\n");
+
+}
+
+ 
+
+ 
+
+int first(char * myId, char * myPwd, int flag){
+
+    int sock, sign;
+
+	char buff[1000];
+
+	struct sockaddr_in serv_addr;
+
+	sock = socket(PF_INET, SOCK_STREAM, 0);
+
+ 
+
+	memset(buff, 0x00, sizeof(buff));
+
+	memset(myId, 0x00, sizeof(myId));
+
+	memset(myPwd, 0x00, sizeof(myPwd));
+
+	memset(&serv_addr, 0, sizeof(serv_addr));
+
+ 
+
+	serv_addr.sin_family = AF_INET;
+
+	serv_addr.sin_addr.s_addr = inet_addr("13.124.167.29");
+
+	serv_addr.sin_port = htons(3090);
+
+	system("clear");
+
+	
+
+    if (flag == 1)
+
+     printf("\t sign up success !!");
+
+ 
+
+    else if(flag ==2)
+
+        printf("\t already exist user!");
+
+    
+
+    else if(flag ==3)
+
+        printf("\t pwd error !");
+
+    
+
+    printf("\n\n\t -------LOGIN--------\n\n");
+
+ 
+
+    printf("\tID : ");
+
+ 
+
+    scanf("%s", myId);
+
+ 
+
+    
+
+ 
+
+    printf("\tPW : ");
+
+ 
+
+    getPwd(myPwd);
+
+ 
+
+    printf("\n\n");
+
+ 
+
+    printf("\t[1]signup [2]signin : ");
+
+ 
+
+    scanf("%d", &sign);
+
+ 
+
+		if (sign == 1) {
+
+			//for signup
+
+			// serv_addr.sin_addr.s_addr = inet_addr("13.209.29.192");
+
+ 
+
+			if (connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) == -1) {
+
+				//printf("connect error");
+
+			}
+
+ 
+
+			sprintf(buff, "%c|%s|%s", '1', myId, myPwd);
+
+			write(sock, buff, sizeof(buff)); // send socket to server
+
+											//printf("%s\n",buff);
+
+			memset(buff, 0x00, sizeof(buff)); // empty buffer
+
+			read(sock, buff, sizeof(buff)); // read socket from server
+
+			//printf("\tuser_idx : ");
+
+			//printf("%s\n", buff);
+
+			
+
+            close(sock);
+
+ 
+
+            //printf("\tuser_idx : ");  //show user_idx
+            //printf("%s\n", buff);
+
+ 
+
+            if (buff != NULL) {
+
+ 
+
+		user_idx = (atoi)(buff);
+
+            
+
+                if( user_idx == -1 ){
+
+                    return first(myId,myPwd,2);
+
+                    }
+
+                
+
+ 
+
+                else{
+
+                user_idx = first(myId, myPwd,1);
+
+			    }	
+
+ 
+
+		    }
+
+        }
+
+ 
+
+ 
+
+		else if (sign == 2) {
+
+			//for login
+
+			if (connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) == -1){
+
+				//printf("connect error");
+
+                        }
+
+ 
+
+			sprintf(buff, "%c|%s|%s", '2', myId, myPwd);
+
+			write(sock, buff, sizeof(buff)); // send socket to server
+
+			//printf("%s\n",buff);
+
+			memset(buff, 0x00, sizeof(buff)); // empty buffer
+
+			read(sock, buff, sizeof(buff)); // read socket from server
+
+ 
+
+            close(sock);
+
+ 
+
+            //printf("\tuser_idx : ");
+
+            //printf("%s\n", buff);
+
+			
+
+ 
+
+			if (buff != NULL) {
+
+ 
+
+                user_idx = (atoi)(buff);
+
+ 
+
+                if( user_idx == -2 ){
+
+            printf("\t pwd error !\n");
+
+                
+
+                return first(myId,myPwd,3);
+
+                    //printf("\t pwd error !\n");
+
+ 
+
+                    //printf("\t press enter and return\n");
+
+         
+
+ 
+
+                    //user_idx=first(myId, myPwd);
+
+        
+
+                    
+
+ 
+
+                  }    
+
+ 
+
+                else{
+
+                printf("\n\tlogin success !");
+
+                    // break;
+
+ 
+
+                }
+
+ 
+
+            }
+
+ 
+
+        }
+
+ 
+
+        else { //not 1 or 2
+
+ 
+
+            system("clear");
+
+ 
+
+            printf("\n\n\t -------LOGIN--------\n\n");
+
+ 
+
+            printf("\tID : ");
+
+ 
+
+            getchar();
+
+ 
+
+            scanf("%s", myId);
+
+ 
+
+            printf("\tPW : ");
+
+ 
+
+            getPwd(myPwd);
+
+ 
+
+            printf("\n\n");
+
+ 
+
+        }
+
+ 
+
+    user_idx = (atoi)(buff);
+
+    return user_idx;
+
+ 
+
+}
+
+ 
+
+void quit(char * name, int user_idx)
+
+{
+
+ 
+
+	char end;
+
+	int previous_score = -1;
+
+ 
+
+	//tcsetattr(0, TCSANOW, &back_attr); //TCSANOW는 즉시속성을 변경을 의미,
+
+ 
+
+	previous_score = previousScore();
+
+ 
+
+	if (score > previous_score) {
+
+		ScoreUpdate();
+
+		int rank = rankGet();
+
+		int firstScore= firstScoreGet();
+
+ 
+
+		if (rank != 1) {
+
+			printf("\n\n\t축하합니다. %s님이 최고점수 %d점을 달성했습니다.\n", name, score);
+
+			printf("\n\t당신은 현재 %d등 입니다. 1등의 %d점 도전해보세요! \n\n", rank, firstScore);
+
+		}
+
+		 
+
+		else{
+
+			printf("\n\n\t축하합니다. %s님이 최고점수 %d점을 달성했습니다.\n", name, score);
+
+			printf("\n\t당신은 현재 1등 입니다. 본인의 최고 점수를 갱신해보세요! \n\n");
+
+		}	
+
+		
+
+	}
+
+	else {
+
+		//rank get
+
+		printf("\n\n\t실력이 많이 녹슬었군요. 과거의 %s님은 점수 %d점을 달성했습니다.\n\n", name, previous_score);
+
+		printf("\n\t 한번 더 도전해서, 과거의 자신을 뛰어 넘어 보세요!\n\n");
+
+	}
+
+	//save the lifes (rare items)
+
+	//saveLifes(user_idx);
+
+	//printf("\n\n\tpress enter to end the game!\n");
+
+	while (1) {
+
+		end = getchar();
+
+		if (end == '\n')break;
+
+	}
+
+	//set_cursor(True);
+
+	//tcsetattr(0, TCSANOW, &back_attr); //TCSANOW는 즉시속성을 변경을 의미, 터미널 세팅을 되돌리기
+
+	//system("clear"); //입력창이 다 밑으로 내려가서 이걸로하면 다시위로감
+
+ 
+
+	return;
+
+}
+
+ 
+
+int previousScore() {
+
+	int sock, previous_score;
+
+	char buff[1000];
+
+	struct sockaddr_in serv_addr;
+
+ 
+
+	sock = socket(PF_INET, SOCK_STREAM, 0);
+
+	memset(buff, 0x00, sizeof(buff));
+
+ 
+
+	memset(&serv_addr, 0, sizeof(serv_addr));
+
+	serv_addr.sin_family = AF_INET;
+
+	serv_addr.sin_addr.s_addr = inet_addr("13.124.167.29");
+
+	serv_addr.sin_port = htons(3090);
+
+ 
+
+	if (connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) == -1) {
+
+		//printf("connect error");
+
+	}
+
+	//socre get
+
+	sprintf(buff, "%c|%d", '5', user_idx);
+
+	write(sock, buff, sizeof(buff));
+
+	//printf("%s\n", buff);
+
+	memset(buff, 0x00, sizeof(buff));
+
+	read(sock, buff, sizeof(buff));
+
+	//printf("%s\n", buff);
+
+	//printf("current score : ");
+
+	previous_score = (atoi)(buff);
+
+	close(sock);
+
+	return previous_score;
+
+}
+
+ 
+
+void ScoreUpdate()
+
+{
+
+	int sock;
+
+	char buff[1000];
+
+	struct sockaddr_in serv_addr;
+
+ 
+
+	sock = socket(PF_INET, SOCK_STREAM, 0);
+
+	memset(buff, 0x00, sizeof(buff));
+
+ 
+
+	memset(&serv_addr, 0, sizeof(serv_addr));
+
+	serv_addr.sin_family = AF_INET;
+
+	serv_addr.sin_addr.s_addr = inet_addr("13.124.167.29");
+
+	serv_addr.sin_port = htons(3090);
+
+ 
+
+	if (connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) == -1) {
+
+		//  printf("connect error");
+
+	}
+
+	memset(buff, 0x00, sizeof(buff));
+
+	sprintf(buff, "%c|%d|%d", '6', score, user_idx);
+
+	write(sock, buff, sizeof(buff));
+
+	//printf("%s\n", buff);
+
+	memset(buff, 0x00, sizeof(buff));
+
+	read(sock, buff, sizeof(buff));
+
+	close(sock);
+
+}
+
+ 
+
+int rankGet()
+
+{
+
+	int sock, rank;
+
+	char buff[1000];
+
+	struct sockaddr_in serv_addr;
+
+ 
+
+	sock = socket(PF_INET, SOCK_STREAM, 0);
+
+	memset(buff, 0x00, sizeof(buff));
+
+ 
+
+	memset(&serv_addr, 0, sizeof(serv_addr));
+
+	serv_addr.sin_family = AF_INET;
+
+	serv_addr.sin_addr.s_addr = inet_addr("13.124.167.29");
+
+	serv_addr.sin_port = htons(3090);
+
+ 
+
+	if (connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) == -1) {
+
+		//  printf("connect error");
+
+	}
+
+	//rank get
+
+	memset(buff, 0x00, sizeof(buff));
+
+	sprintf(buff, "%c|%d", '7', user_idx);
+
+	write(sock, buff, sizeof(buff));
+
+	//printf("%s\n", buff);
+
+	memset(buff, 0x00, sizeof(buff));
+
+	read(sock, buff, sizeof(buff));
+
+	//printf("%s\n", buff);
+
+	//printf("my Rank : ");
+
+	rank = (atoi)(buff)+1;
+
+	//printf("%c\n",buff[9]);
+
+	// printf("%d\n", myRank);
+
+	close(sock);
+
+	return rank;
+
+}
+
+ 
+
+ 
+
+int firstScoreGet()
+
+{
+
+	int sock, first = 0;
+
+	char buff[1000];
+
+	struct sockaddr_in serv_addr;
+
+ 
+
+	sock = socket(PF_INET, SOCK_STREAM, 0);
+
+	memset(buff, 0x00, sizeof(buff));
+
+ 
+
+	memset(&serv_addr, 0, sizeof(serv_addr));
+
+	serv_addr.sin_family = AF_INET;
+
+	serv_addr.sin_addr.s_addr = inet_addr("13.124.167.29");
+
+	serv_addr.sin_port = htons(3090);
+
+ 
+
+	if (connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) == -1) {
+
+		//printf("connect error");
+
+	}
+
+ 
+
+	memset(buff, 0x00, sizeof(buff));
+
+	sprintf(buff, "%c|", '8');
+
+	write(sock, buff, sizeof(buff));
+
+	//printf("%s\n", buff);
+
+	memset(buff, 0x00, sizeof(buff));
+
+	read(sock, buff, sizeof(buff));
+
+	//printf("%s\n", buff);
+
+	first = (atoi)(buff);
+
+	return first;
+
+}
+
 void faceCam()
 {
 
@@ -1627,6 +2185,7 @@ int startGame()
   int argc = 0;
   char **argv = 0;
   glutInit(&argc, argv);
+  glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
   glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
   //parse command line arguments
   char ftFile[256], conFile[256], triFile[256];
@@ -1695,6 +2254,19 @@ int startGame()
 
   glutMainLoop();
 }
+void gameRank(){
+
+ namedWindow("GAME RANK", WINDOW_AUTOSIZE);
+
+  Mat image = cv::imread("/home/miranlee/FaceTracker/image/ranking.bmp", CV_LOAD_IMAGE_COLOR);
+  
+  putText(image,myId,Point(83,108),CV_FONT_HERSHEY_SIMPLEX, 3, CV_RGB(255, 255, 255));
+  imshow("GAME RANK", image);
+
+  waitKey(0);
+
+}
+
 
 void ruleMouseEvent(int event, int x, int y, int flags, void *i)
 {
@@ -1774,7 +2346,10 @@ void onMouseEvent(int event, int x, int y, int flags, void *i = 0)
     }
     else if (x > 151 && x < 300 && y > 350 && y < 410)
     { //rank
-      cout << "rank" << endl;
+        Mat push_button = imread("/home/miranlee/FaceTracker/image/rank_push.bmp", CV_LOAD_IMAGE_COLOR);
+      imshow("YAM-YAM", push_button);
+      waitKey(1);
+      gameRank();
     }
     else if (x > 345 && x < 491 && y > 350 && y < 410)
     { //exit
@@ -1785,6 +2360,11 @@ void onMouseEvent(int event, int x, int y, int flags, void *i = 0)
 //--------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
+char myPwd[100];
+int user_idx = -1;
+user_idx = first(myId, myPwd,0);
+if(user_idx!=1){
+
   Mat image = cv::imread("/home/miranlee/FaceTracker/image/인트로.png", CV_LOAD_IMAGE_COLOR);
   if (image.empty())
   {
@@ -1799,6 +2379,12 @@ int main(int argc, char **argv)
   imshow("YAM-YAM", image);
 
   waitKey(0);
+}
+else {
+cout<<"failed login"<<endl;
+return 0;
+}
+    quit(myId, user_idx);
 
   return 0;
 }
