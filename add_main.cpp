@@ -58,7 +58,11 @@ void sound(const char * filename, int len) {
 	endAudio();
 	freeAudio(sound);
 }
-
+/*
+<<<<<<< read me >>>>>>>>
+ 위에 두 함수 메인 파일에 추가하고 
+ 사용하고 싶은 노래.wav 같은 경로에 놓고 sound("test.wav", 2000); 이런 식으로 시작 
+*/
 int main(int argc, char **argv)
 {
 	/* Initialize only SDL Audio on default device */
