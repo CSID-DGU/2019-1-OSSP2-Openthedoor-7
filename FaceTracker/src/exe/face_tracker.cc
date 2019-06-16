@@ -1068,7 +1068,7 @@ void warning(Mat &image)
 
   if (facePts[0].x < 40 || facePts[20].y < 40 || facePts[16].x > 600 || facePts[8].y > 440) //입안에 들어왔을 때
   {
-    cv::Mat roi = image(cv::Rect(40, 40, 600, 440));
+    cv::Mat roi = image(cv::Rect(40, 40, 400, 560));
     cv::Mat color(roi.size(), CV_8UC3, cv::Scalar(0, 0, 255));
     double alpha = 0.3;
     cv::addWeighted(color, alpha, roi, 1.0 - alpha, 0.0, roi);
@@ -1897,7 +1897,7 @@ void gameRank()
 char hhh[100];
 namedWindow("GAME RANK", WINDOW_AUTOSIZE);
 
-Mat image = cv::imread("/home/miranlee/FaceTracker/image/rank1.png", CV_LOAD_IMAGE_COLOR);
+Mat image = cv::imread("../image/rank1.png", CV_LOAD_IMAGE_COLOR);
   
 int high_score=previousScore();
 sprintf(hhh, "%d", high_score);
@@ -1920,19 +1920,19 @@ void ruleMouseEvent(int event, int x, int y, int flags, void *i)
 
       if (x > 410 && x < 457) //다음으로 넘기기
       {
-        Mat nextPage = imread("/home/miranlee/FaceTracker/image/rule1.bmp", CV_LOAD_IMAGE_COLOR);
+        Mat nextPage = imread("../image/rule1.bmp", CV_LOAD_IMAGE_COLOR);
         imshow("GAME RULE", nextPage);
         waitKey(1);
       }
       else if (x > 465 && x < 509)
       {
-        Mat nextPage = imread("/home/miranlee/FaceTracker/image/rule2.bmp", CV_LOAD_IMAGE_COLOR);
+        Mat nextPage = imread("../image/rule2.bmp", CV_LOAD_IMAGE_COLOR);
         imshow("GAME RULE", nextPage);
         waitKey(1);
       }
       else if (x > 518 && x < 560)
       {
-        Mat nextPage = imread("/home/miranlee/FaceTracker/image/rule3.bmp", CV_LOAD_IMAGE_COLOR);
+        Mat nextPage = imread("../image/rule3.bmp", CV_LOAD_IMAGE_COLOR);
         imshow("GAME RULE", nextPage);
         waitKey(1);
       }
@@ -1944,9 +1944,10 @@ void ruleMouseEvent(int event, int x, int y, int flags, void *i)
 }
 void gameRule()
 {
-  namedWindow("GAME RULE", WINDOW_AUTOSIZE);
+    namedWindow("GAME RULE", WINDOW_GUI_NORMAL);
+    resizeWindow("GAME RULE", 640, 480);
 
-  Mat image = cv::imread("/home/miranlee/FaceTracker/image/rule1.bmp", CV_LOAD_IMAGE_COLOR);
+  Mat image = cv::imread("../image/rule1.bmp", CV_LOAD_IMAGE_COLOR);
   int rule_page = 1;
   setMouseCallback("GAME RULE", ruleMouseEvent, (void *)&rule_page);
 
@@ -1962,21 +1963,21 @@ void onMouseEvent(int event, int x, int y, int flags, void *i = 0)
   {
     if (x > 151 && x < 300 && y > 247 && y < 299)
     { //start
-      Mat push_button = imread("/home/miranlee/FaceTracker/image/start_push.bmp", CV_LOAD_IMAGE_COLOR);
+      Mat push_button = imread("../image/start_push.bmp", CV_LOAD_IMAGE_COLOR);
       imshow("YAM-YAM", push_button);
       waitKey(1);
       startGame();
     }
     else if (x > 345 && x < 491 && y > 247 && y < 299) //rule
     {
-      Mat push_button = imread("/home/miranlee/FaceTracker/image/rule_push.bmp", CV_LOAD_IMAGE_COLOR);
+      Mat push_button = imread("../image/rule_push.bmp", CV_LOAD_IMAGE_COLOR);
       imshow("YAM-YAM", push_button);
       waitKey(1);
       gameRule();
     }
     else if (x > 151 && x < 300 && y > 350 && y < 410)
     { //rank
-      Mat push_button = imread("/home/miranlee/FaceTracker/image/rank_push.bmp", CV_LOAD_IMAGE_COLOR);
+      Mat push_button = imread("../image/rank_push.bmp", CV_LOAD_IMAGE_COLOR);
       imshow("YAM-YAM", push_button);
       waitKey(1);
       gameRank();
@@ -1990,22 +1991,24 @@ void onMouseEvent(int event, int x, int y, int flags, void *i = 0)
 //--------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
+
+
   char myPwd[100];
   int user_idx = -1;
   user_idx = first(myId, myPwd, 0);
 
   if (user_idx != 1)
   {
-
-    Mat image = cv::imread("/home/miranlee/FaceTracker/image/인트로.png", CV_LOAD_IMAGE_COLOR);
-    if (image.empty())
+Mat image = cv::imread("../image/intro.bmp", CV_LOAD_IMAGE_COLOR);
+    
+     if (image.empty())
     {
       cout << "Could not open or find the image" << endl;
       return -1;
     }
 
-    namedWindow("YAM-YAM", WINDOW_AUTOSIZE);
-
+    namedWindow("YAM-YAM", WINDOW_GUI_NORMAL);
+    resizeWindow("YAM-YAM", 640, 480);
     setMouseCallback("YAM-YAM", onMouseEvent);
 
     imshow("YAM-YAM", image);
