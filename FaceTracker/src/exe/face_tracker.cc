@@ -1068,7 +1068,7 @@ void warning(Mat &image)
 
   if (facePts[0].x < 40 || facePts[20].y < 40 || facePts[16].x > 600 || facePts[8].y > 440) //입안에 들어왔을 때
   {
-    cv::Mat roi = image(cv::Rect(40, 40, 400, 560));
+    cv::Mat roi = image(cv::Rect(40, 40, 560, 400));
     cv::Mat color(roi.size(), CV_8UC3, cv::Scalar(0, 0, 255));
     double alpha = 0.3;
     cv::addWeighted(color, alpha, roi, 1.0 - alpha, 0.0, roi);
