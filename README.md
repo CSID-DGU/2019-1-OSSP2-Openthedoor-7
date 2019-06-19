@@ -6,7 +6,7 @@ Face Tracker 와 Node.js를 이용한 게임 개발
 Node.js, AWS EC2, RDS를 이용한 서버 및 DB 구축 
 
 
-## 팀원
+### 팀원
 <pre>
 김예지(2017112065) - Open GL 도형 구현
 
@@ -17,7 +17,8 @@ Node.js, AWS EC2, RDS를 이용한 서버 및 DB 구축
 이미란(2017112076) - Face tracker 및 Open CV 영상 처리, UI제작
 </pre>
 
-## 오픈소스 출처
+
+### 오픈소스 출처
 FaceTracker
 https://github.com/kylemcdonald/FaceTracker  
 OpenCV
@@ -29,12 +30,13 @@ Node.js
 https://nodejs.org/ko/
 
 
-## 개발 환경
+### 개발 환경
 Develop Tool:C++, Node.js, MySQL, aws ec2, aws RDS
 
 Develop Environment: Ubuntu Linux (16.04 버전 사용)
 
-## 실행환경(컴파일 환경)
+
+### 실행환경(컴파일 환경)
 
 * (https://github.com/opencv/opencv "OpenCV")를 설치합니다.  
 <pre>
@@ -44,18 +46,18 @@ $ cd FaceTracker
 $ make   # 옵션을 추가해서 빌드시 에러 발생 
 </pre>
 
-## 실행하기
+### 실행하기
 <pre>
 $ cd bin
 $ ./face_tracker
 </pre>
 
-## 실행 화면
+### 실행 화면
 
 
 
 
-## 디렉토리 구조 
+### 디렉토리 구조 
 <pre>
 
 
