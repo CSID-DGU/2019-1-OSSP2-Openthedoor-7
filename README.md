@@ -41,7 +41,7 @@ Develop Environment: Ubuntu Linux (16.04 버전 사용)
 * (https://github.com/opencv/opencv "OpenCV")를 설치합니다.  
 <pre>
 우분투 
-$ git clone https://github.com/kylemcdonald/FaceTracker  
+$ git clone https://github.com/CSID-DGU/2019-1-OSSP2-Openthedoor-7.git  
 $ cd FaceTracker
 $ make   # 옵션을 추가해서 빌드시 에러 발생 
 </pre>
@@ -65,5 +65,5 @@ $ ./face_tracker
 </pre>
 
 ### 문의
-작동 오류 문의 - 신소희(skysohe@naver.com)
+작동 오류 문의 - 신소희(skysohe@naver.com) 이미란(rannan09@naver.com)
 
