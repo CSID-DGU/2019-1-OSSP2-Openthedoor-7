@@ -10,25 +10,22 @@
 ## 팀원
 <pre>
 김예지(2017112065) - Open GL 도형 구현
-
 김혜지(2017112082) - 서버, 소켓 구현
- 
 신소희(2017112106) - 팀장, 서버, 소켓 구현
-
 이미란(2017112076) - Face tracker 및 Open CV 영상 처리, UI제작
 </pre>
 
 
 ## 오픈소스 출처
 <pre>
-FaceTracker
-https://github.com/kylemcdonald/FaceTracker  
-OpenCV
-https://github.com/opencv/opencv  
-OpenGL
-https://www.opengl.org/
-Node.js
-https://nodejs.org/ko/
+*FaceTracker
+<https://github.com/kylemcdonald/FaceTracker>
+*OpenCV
+<https://github.com/opencv/opencv> 
+*OpenGL
+<https://www.opengl.org/>
+*Node.js
+<https://nodejs.org/ko/>
 </pre>
 
 ## 개발 환경
@@ -47,7 +44,7 @@ Develop Environment: Ubuntu Linux (16.04 버전 사용)
 $ sudo apt-get install libcv-dev libopencv-dev
 </pre>
 OpenCV2 설치를 권장합니다. 우분투 버전에 맞게 설치를 진행해주세요.
-위의 명령어로 설치가 정상적으로 진행되지 않는다면 OpenCV GitHub에 가서 매뉴얼대로 설치를 진행해주세요.
+위의 명령어로 설치가 정상적으로 진행되지 않는다면 [OpenCV GitHub](https://github.com/opencv/opencv)에 가서 매뉴얼대로 설치를 진행해주세요.
 
 3. OpenGL 설치하기
 
