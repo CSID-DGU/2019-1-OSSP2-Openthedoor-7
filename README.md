@@ -37,7 +37,7 @@ Develop Environment: Ubuntu Linux (16.04 버전 사용)
 
 ## 실행 환경(컴파일 환경)
 
-1. Web Camera 실행하기
+### 1. Web Camera 실행하기
 
 우분투에서 웹카메라를 활성화하기 위해선 두가지의 옵션이 있습니다.
 
@@ -50,7 +50,7 @@ Develop Environment: Ubuntu Linux (16.04 버전 사용)
 
 ** 웹카메라가 정상적으로 실행되는지 확인하시려면 cheese를 설치하셔서 확인
 
-2. OpenCV 설치하기
+### 2. OpenCV 설치하기
 <pre>
 $ sudo apt-get install libcv-dev libopencv-dev
 </pre>
@@ -58,33 +58,29 @@ OpenCV 버전2 설치를 권장합니다. 우분투 버전에 맞게 설치를 �
 
 위의 명령어로 설치가 정상적으로 진행되지 않는다면 [OpenCV GitHub](https://github.com/opencv/opencv)에 가서 매뉴얼대로 설치를 진행해주세요.
 
-3. OpenGL 설치하기
+### 3. OpenGL 설치하기
 
-4. 실행하기
+### 4. 실행하기
 <pre>
 $ git clone https://github.com/CSID-DGU/2019-1-OSSP2-Openthedoor-7.git  
 $ cd FaceTracker
 $ make   # 옵션을 추가해서 빌드시 에러 발생 
 </pre>
 
-### 실행하기
-<pre>
-$ cd bin
-$ ./face_tracker
-</pre>
 
-### 실행 화면
+
+## 실행 화면
 
 
 
 
-### 디렉토리 구조 
+## 디렉토리 구조 
 <pre>
 
 
 
 </pre>
 
-### 문의
+## 문의
 작동 오류 문의 - 신소희(skysohe@naver.com) 이미란(rannan09@naver.com)
 
