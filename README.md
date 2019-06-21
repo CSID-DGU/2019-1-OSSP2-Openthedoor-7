@@ -35,19 +35,21 @@ Develop Tool:C++, Node.js, MySQL, aws ec2, aws RDS
 Develop Environment: Ubuntu Linux (16.04 버전 사용)
 
 
-## 실행 환경(컴파일 환경)
+## 실행 방법
 
 ### 1. Web Camera 실행하기
 
 우분투에서 웹카메라를 활성화하기 위해선 두가지의 옵션이 있습니다.
 
 (1) Virtual Box를 사용하는 경우
-* Virtual Box로 이동하여 설치된 Virtual Box 버전과 맞는 Extension Pack을 설치해주세요.
-* 웹캠을 활성화해주세요.
-
+<pre>
+$ Virtual Box로 이동하여 설치된 Virtual Box 버전과 맞는 Extension Pack을 설치해주세요.
+$ 웹캠을 활성화해주세요.
+</pre>
 (2) 가상머신 없이 우분투를 사용하는 경우
-* 바로 아래 단계로 이동해주세요.
-
+<pre>
+$ 바로 아래 단계로 이동해주세요.
+</pre>
 ** 웹카메라가 정상적으로 실행되는지 확인하시려면 cheese를 설치하셔서 확인
 
 ### 2. OpenCV 설치하기
