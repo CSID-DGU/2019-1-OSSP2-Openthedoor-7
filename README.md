@@ -1,12 +1,15 @@
 # 2019-1-OSSP2-Openthedoor-7
+
 ## "YAM-YAM" Game program using Face Tracker
 
-Face Tracker 와 Node.js를 이용한 게임 개발
+> 얼굴을 인식해 도형을 먹으며 점수를 올리고, 최고 점수가 기록되어 친구와 경쟁할 수 있는 게임 프로그램입니다. 
 
-Node.js, AWS EC2, RDS를 이용한 서버 및 DB 구축 
+> OpenCV 기반 Face Tracker와 OpenGL 이용하여 게임 제작
+
+> Node.js, AWS EC2, RDS를 이용한 서버 및 DB 구축
 
 
-### 팀원
+## 팀원
 <pre>
 김예지(2017112065) - Open GL 도형 구현
 
@@ -38,9 +41,20 @@ Develop Environment: Ubuntu Linux (16.04 버전 사용)
 
 ### 실행 환경(컴파일 환경)
 
-* (https://github.com/opencv/opencv "OpenCV")를 설치합니다.  
+1. Web Camera 실행하기
+
+
+2. OpenCV 설치하기
 <pre>
-우분투 
+$ sudo apt-get install libcv-dev libopencv-dev
+</pre>
+OpenCV2 설치를 권장합니다. 우분투 버전에 맞게 설치를 진행해주세요.
+위의 명령어로 설치가 정상적으로 진행되지 않는다면 OpenCV GitHub에 가서 매뉴얼대로 설치를 진행해주세요.
+
+3. OpenGL 설치하기
+
+4. 실행하기
+<pre>
 $ git clone https://github.com/CSID-DGU/2019-1-OSSP2-Openthedoor-7.git  
 $ cd FaceTracker
 $ make   # 옵션을 추가해서 빌드시 에러 발생 
