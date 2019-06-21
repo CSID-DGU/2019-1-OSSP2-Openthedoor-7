@@ -2,11 +2,9 @@
 
 ## "YAM-YAM" Game program using Face Tracker
 
-> 얼굴을 인식해 도형을 먹으며 점수를 올리고, 최고 점수가 기록되어 친구와 경쟁할 수 있는 게임 프로그램입니다. 
-
-> OpenCV 기반 Face Tracker와 OpenGL 이용하여 게임 제작
-
-> Node.js, AWS EC2, RDS를 이용한 서버 및 DB 구축
+* 얼굴을 인식해 도형을 먹으며 점수를 올리고, 최고 점수가 기록되어 친구와 경쟁할 수 있는 게임 프로그램입니다. 
+* OpenCV 기반 Face Tracker와 OpenGL 이용하여 게임 제작
+* Node.js, AWS EC2, RDS를 이용한 서버 및 DB 구축
 
 
 ## 팀원
