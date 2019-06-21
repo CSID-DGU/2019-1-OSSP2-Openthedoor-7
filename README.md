@@ -66,7 +66,7 @@ OpenCV 버전2 설치를 권장합니다. 우분투 버전에 맞게 설치를 �
 $ sudo apt-get update
 $ sudo apt-get install -y build-essential
 $ sudo apt-get install freeglut3-dev libglu1-mesa-dev mesa-common-dev
-$ sudo apt-get install libsdl2-dev     # 사운드 사용위해
+$ sudo apt-get install libsdl2-dev  # 사운드
 </pre>
 
 ### 4. 실행하기
@@ -78,7 +78,7 @@ $ cd bin
 $ ./face_tracker
 </pre>
 
-++ 게임 사용 방법은 시연 영상을 참고해주세요 ! ++
+ 게임 사용 방법은 **시연 영상**을 참고해주세요 !
 
 
 ## 실행 화면
