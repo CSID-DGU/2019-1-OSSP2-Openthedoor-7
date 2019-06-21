@@ -2,7 +2,7 @@
 
 ## "YAM-YAM" Game program using Face Tracker
 
-* 얼굴을 인식해 도형을 먹으며 점수를 올리고, 최고 점수가 기록되어 친구와 경쟁할 수 있는 게임 프로그램입니다. 
+> 얼굴을 인식해 도형을 먹으며 점수를 올리고, 최고 점수가 기록되어 친구와 경쟁할 수 있는 게임 프로그램입니다. 
 * OpenCV 기반 Face Tracker와 OpenGL 이용하여 게임 제작
 * Node.js, AWS EC2, RDS를 이용한 서버 및 DB 구축
 
@@ -19,7 +19,7 @@
 </pre>
 
 
-### 오픈소스 출처
+## 오픈소스 출처
 <pre>
 FaceTracker
 https://github.com/kylemcdonald/FaceTracker  
@@ -31,13 +31,13 @@ Node.js
 https://nodejs.org/ko/
 </pre>
 
-### 개발 환경
+## 개발 환경
 Develop Tool:C++, Node.js, MySQL, aws ec2, aws RDS
 
 Develop Environment: Ubuntu Linux (16.04 버전 사용)
 
 
-### 실행 환경(컴파일 환경)
+## 실행 환경(컴파일 환경)
 
 1. Web Camera 실행하기
 
