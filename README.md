@@ -17,16 +17,17 @@
 
 
 ## 오픈소스 출처
-<pre>
-*FaceTracker
+
+* FaceTracker
 <https://github.com/kylemcdonald/FaceTracker>
-*OpenCV
+* OpenCV
 <https://github.com/opencv/opencv> 
-*OpenGL
+* OpenGL
 <https://www.opengl.org/>
-*Node.js
+* Node.js
 <https://nodejs.org/ko/>
-</pre>
+
+
 
 ## 개발 환경
 Develop Tool:C++, Node.js, MySQL, aws ec2, aws RDS
@@ -38,12 +39,23 @@ Develop Environment: Ubuntu Linux (16.04 버전 사용)
 
 1. Web Camera 실행하기
 
+우분투에서 웹카메라를 활성화하기 위해선 두가지의 옵션이 있습니다.
+
+(1) Virtual Box를 사용하는 경우
+* Virtual Box로 이동하여 설치된 Virtual Box 버전과 맞는 Extension Pack을 설치해주세요.
+* 웹캠을 활성화해주세요.
+
+(2) 가상머신 없이 우분투를 사용하는 경우
+* 바로 아래 단계로 이동해주세요.
+
+** 웹카메라가 정상적으로 실행되는지 확인하시려면 cheese를 설치하셔서 확인
 
 2. OpenCV 설치하기
 <pre>
 $ sudo apt-get install libcv-dev libopencv-dev
 </pre>
-OpenCV2 설치를 권장합니다. 우분투 버전에 맞게 설치를 진행해주세요.
+OpenCV 버전2 설치를 권장합니다. 우분투 버전에 맞게 설치를 진행해주세요.
+
 위의 명령어로 설치가 정상적으로 진행되지 않는다면 [OpenCV GitHub](https://github.com/opencv/opencv)에 가서 매뉴얼대로 설치를 진행해주세요.
 
 3. OpenGL 설치하기
