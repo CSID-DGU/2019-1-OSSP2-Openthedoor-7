@@ -24,8 +24,7 @@ router.post('/', async (req, res) => {
 			});
 		} else if (checkResult.length === 1) {		// 배열의 길이 === 1 => DB에 user_id가 존재
 			res.status(400).send({
-				message : "Already Exists",
-				user_idx : "-1"
+				message : "Already Exists"
 			});
 		} else {																	
 			const salt = await crypto.randomBytes(32);			

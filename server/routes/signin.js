@@ -22,7 +22,8 @@ router.post('/', async (req, res) => {
 			res.status(500).send({
 				message : "Internal Server Error"
 			});
-		} else if (checkResult.length === 1) {		// user_id 가 존재하는 경우
+		} 
+		else if (checkResult.length === 1) {		// user_id 가 존재하는 경우
 			let hashedpwd = await crypto.pbkdf2(user_pw, checkResult[0].user_salt, 100000, 32, 'sha512');	// 입력받은 pw를 DB에 존재하는 salt로 hashing
 	    if (hashedpwd.toString('base64') === checkResult[0].user_pw) {	// hashedpw와 DB에 저장된 해싱된 pw 비교 => 같으면 제대로 된 비밀번호 입력
 	      res.status(201).send({
@@ -31,15 +32,14 @@ router.post('/', async (req, res) => {
 	      });
 	    } else {
 	      res.status(400).send({
-	        message : "Login Failed" ,
-		user_idx : "-2"// 클라이언트에게는 login에러라고만 보내줌
+	        message : "Login Failed" 					// 클라이언트에게는 login에러라고만 보내줌
 	      });
 	      console.log("pwd error");							// 콘솔창에는 어떤 에러인지 표시
 	    }
-		} else {
+		} 
+		else {
 			res.status(400).send({
-				message : "Login Failed",
-				user_idx : "-1"// 클라이언트에게는 login에러라고만 보내줌
+				message : "Login Failed"							// 클라이언트에게는 login에러라고만 보내줌
 			});
 			console.log("id error");								// 콘솔창에는 어떤 에러인지 표시
 		}
