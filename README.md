@@ -42,18 +42,19 @@ Develop Environment: Ubuntu Linux (16.04 버전 사용)
 우분투에서 웹카메라를 활성화하기 위해선 두가지의 옵션이 있습니다.
 
 (1) Virtual Box를 사용하는 경우
-<pre>
-$ Virtual Box로 이동하여 설치된 Virtual Box 버전과 맞는 Extension Pack을 설치해주세요.
-$ 웹캠을 활성화해주세요.
-</pre>
+
+* [Virtual Box](https://www.virtualbox.org/wiki/Downloads)로 이동하여 설치된 Virtual Box 버전과 맞는 Extension Pack을 설치해주세요.
+* 웹캠을 활성화해주세요.
+
 (2) 가상머신 없이 우분투를 사용하는 경우
-<pre>
-$ 바로 아래 단계로 이동해주세요.
-</pre>
-** 웹카메라가 정상적으로 실행되는지 확인하시려면 cheese를 설치하셔서 확인
+* 바로 아래 단계로 이동해주세요.
+
+** 웹카메라가 정상적으로 실행되는지 확인하시려면 cheese를 설치하셔서 확인하세요.
 
 ### 2. OpenCV 설치하기
 <pre>
+$ sudo apt-get update
+$ sudo apt-get install -y build-essential
 $ sudo apt-get install libcv-dev libopencv-dev
 </pre>
 OpenCV 버전2 설치를 권장합니다. 우분투 버전에 맞게 설치를 진행해주세요.
@@ -61,12 +62,20 @@ OpenCV 버전2 설치를 권장합니다. 우분투 버전에 맞게 설치를 �
 위의 명령어로 설치가 정상적으로 진행되지 않는다면 [OpenCV GitHub](https://github.com/opencv/opencv)에 가서 매뉴얼대로 설치를 진행해주세요.
 
 ### 3. OpenGL 설치하기
+<pre>
+$ sudo apt-get update
+$ sudo apt-get install -y build-essential
+$ sudo apt-get install freeglut3-dev libglu1-mesa-dev mesa-common-dev
+$ sudo apt-get install libsdl2-dev     # 사운드 사용위해
+</pre>
 
 ### 4. 실행하기
 <pre>
 $ git clone https://github.com/CSID-DGU/2019-1-OSSP2-Openthedoor-7.git  
 $ cd FaceTracker
 $ make   # 옵션을 추가해서 빌드시 에러 발생 
+$ cd bin
+$ ./face_tracker
 </pre>
 
 
