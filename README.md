@@ -19,16 +19,16 @@ Node.js, AWS EC2, RDS를 이용한 서버 및 DB 구축
 
 
 ### 오픈소스 출처
+<pre>
 FaceTracker
 https://github.com/kylemcdonald/FaceTracker  
 OpenCV
 https://github.com/opencv/opencv  
 OpenGL
 https://www.opengl.org/
-
 Node.js
 https://nodejs.org/ko/
-
+</pre>
 
 ### 개발 환경
 Develop Tool:C++, Node.js, MySQL, aws ec2, aws RDS
@@ -36,7 +36,7 @@ Develop Tool:C++, Node.js, MySQL, aws ec2, aws RDS
 Develop Environment: Ubuntu Linux (16.04 버전 사용)
 
 
-### 실행환경(컴파일 환경)
+### 실행 환경(컴파일 환경)
 
 * (https://github.com/opencv/opencv "OpenCV")를 설치합니다.  
 <pre>
