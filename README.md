@@ -141,7 +141,7 @@ FaceTracker
 </pre>
 
 ## 문의
-작동 오류 문의 - 김예지()
-                김혜지()
+작동 오류 문의 - 김예지(dpwl2807@naver.com)
+                김혜지(sosox00@naver.com)
                 신소희(skysohe@naver.com) 
                 이미란(rannan09@naver.com)
