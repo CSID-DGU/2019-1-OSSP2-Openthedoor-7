@@ -99,7 +99,7 @@ $ ./face_tracker
 
 ### 3. GAME
 
-![game1](./gameImage/r_game.png)
+![game1](./gameImage/r_game1.png)
 ![game2](./gameImage/r_game2.png)
 ![game3](./gameImage/r_game3.png)
 
