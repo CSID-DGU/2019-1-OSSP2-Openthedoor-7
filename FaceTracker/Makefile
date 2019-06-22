@@ -8,12 +8,14 @@ CXX=g++
 # Flags
 ARCH_FLAGS=
 
+OPENCV = `pkg-config opencv --cflags --libs`
+LIBS = $(OPENCV)
 CFLAGS=-Wextra -Wall $(ARCH_FLAGS) -O3 -Wno-long-long
 LDFLAGS=$(ARCH_FLAGS)
 DEFINES=
 INCLUDES=-I$(OPENCV_PATH)/include -Iinclude/
-LIBRARIES=-L$(OPENCV_PATH)/lib -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_objdetect
-LINKER_FLAGS = -lGL -lGLU -lglut -lm
+LIBRARIES=-L$(OPENCV_PATH)/lib -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_objdetect -lopencv_highgui
+LINKER_FLAGS = -lGL -lGLU -lglut -lm -lSDL2 -lstdc++ -fpermissive -pthread
 # Files which require compiling
 SOURCE_FILES=\
 	src/lib/IO.cc\
@@ -44,12 +46,12 @@ all: bin/face_tracker
 	@# Make dependecy file
 	$(CXX) -MM -MT $@ -MF $(patsubst %.cc,%.d,$<) $(CFLAGS) $(DEFINES) $(INCLUDES) $<
 	@# Compile
-	$(CXX) $(CFLAGS) $(DEFINES) -c -o $@ $< $(INCLUDES)
+	$(CXX) $(CFLAGS) $(DEFINES) -c -o $@ $< $(INCLUDES) $(LIBS)
 
 -include $(DEPENDENCY_FILES)
 
 bin/face_tracker: $(ALL_OBJECTS)
-	$(CXX) $(LDFLAGS) -o $@ $(ALL_OBJECTS) $(LIBRARIES) $(LINKER_FLAGS)
+	$(CXX) $(LDFLAGS) -o $@ $(ALL_OBJECTS) audio.c $(LIBRARIES) $(LINKER_FLAGS) $(LIBS)
 
 .PHONY: clean
 clean:
