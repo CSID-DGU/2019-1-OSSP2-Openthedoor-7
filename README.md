@@ -111,6 +111,33 @@ $ ./face_tracker
 ## 디렉토리 구조 
 <pre>
 Server
+
+├── app.js
+├── bin
+│   └── www
+├── config
+│   └── dbPool.js
+├── module
+│   └── pool.js
+├── node_modules
+├── npm-debug.log
+├── package.json
+├── package-lock.json
+├── public
+│   └── stylesheets
+├── routes
+│   ├── first.js
+│   ├── index.js
+│   ├── ranking.js
+│   ├── rank.js
+│   ├── score.js
+│   ├── signin.js
+│   ├── signup.js
+│   └── users.js
+└── views
+    ├── error.jade
+    ├── index.jade
+    └── layout.jade
 </pre>
 <pre>
 FaceTracker
