@@ -61,6 +61,9 @@ $ ./face_tracker
 </pre>
 
  게임 사용 방법은 **시연 영상**을 참고해주세요 !
+ ## 시연 영상
+ ![YAM-YAM](./gameImage/YAM-YAM.gif)
+
 
 
 ## 실행 화면
