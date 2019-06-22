@@ -1031,7 +1031,7 @@ void inTriRandomMoving(int a, int l)
   }
 }
 
-void CVtoGL()
+void CVtoGL() // OpenCV의 좌표를 OpenGL좌표에 맞춰 변환
 {
 
   int w = 640;
@@ -1121,7 +1121,7 @@ void Draw(cv::Mat &image, cv::Mat &shape, cv::Mat &con, cv::Mat &tri, cv::Mat &v
   c = CV_RGB(255, 0, 0);
   cv::fillConvexPoly(image, pts, 6, c);
 
-  warning(image);
+  warning(image); //그어진 선을 벗어난 경우 경고하는 함수
 
   return;
 }
@@ -1238,7 +1238,7 @@ int parse_cmd(int argc, char **argv,
 }
 //=============================================================================
 //=============================================================================
-GLuint MatToTexture(Mat image)
+GLuint MatToTexture(Mat image) //OpenCV의 Mat이미지를 gluint 텍스처로 맵핑
 {
   if (image.empty())
     return -1;
@@ -1259,7 +1259,7 @@ GLuint MatToTexture(Mat image)
   return textureID;
 }
 
-void draw_background()
+void draw_background() //크기에 맞춰 배경 그림 
 {
   int x = screenW;
   int y = screenH;
@@ -1276,28 +1276,27 @@ void draw_background()
   glEnd();
 }
 
-void desLife()
+void desLife() // 생명 감소시 호출되는 함수
 {
 
-  cv::Scalar cc(0, 0, 255);
+  cv::Scalar cc(0, 0, 255); //빨간색 지정
   Mat copy;
   double alpha = 0.5;
 
-  life--;
-  if (life == 0)
+  life--; //life 감소
+  if (life == 0) //life가 0이되는 경우
   {
 
     im.copyTo(copy); //추가
     fillConvexPoly(copy, facePts, 27, cc);
     addWeighted(copy, alpha, im, 1 - alpha, 0, im); //추가
-    //sleep(1000);
-    //exit(0);
-    glutLeaveMainLoop();
-    endGame();
+
+    glutLeaveMainLoop(); //glut의 반복문을 벗아남
+    endGame(); //endGame 함수 호출
   }
 }
 
-void warning(Mat &image)
+void warning(Mat &image) //지정해놓은 사각형을 벗어나는 경우 경고 후 재 인식 or 피버 타임
 {
 
   cv::Scalar cc(0, 0, 255);
@@ -1309,14 +1308,15 @@ void warning(Mat &image)
     cv::Mat color(roi.size(), CV_8UC3, cv::Scalar(0, 0, 255));
     double alpha = 0.3;
     cv::addWeighted(color, alpha, roi, 1.0 - alpha, 0.0, roi);
-    model->FrameReset();
-  }else if(flag==1){
+    model->FrameReset(); // 프레임 재 식
+
+  }else if(flag==1){//피버 타임인 경우
     cv::Mat roi = image(cv::Rect(40, 40, 560, 400));
     cv::Mat color(roi.size(), CV_8UC3, cv::Scalar(0, 0, 255));
     double alpha = 0.3;
     cv::addWeighted(color, alpha, roi, 1.0 - alpha, 0.0, roi); 
    // putText(im, dynamic_score, cv::Point(440, 30), CV_FONT_HERSHEY_SIMPLEX, 0.8, CV_RGB(0, 0, 0), 2);
-  
+  // 피버 타임 출력
     putText(image,"BURNING!!!",Point(100,30),CV_FONT_HERSHEY_SIMPLEX, 0.8, CV_RGB(255, 0, 0),2);
   }
 }
@@ -1333,7 +1333,7 @@ void *crunchSound1(void *arg)
   SDL_Quit();
 }
 
-void display()
+void display() //계속해서 호출되는 디스플레이 함수
 {
   if (SDL_Init(SDL_INIT_AUDIO) < 0)
   {
@@ -1344,7 +1344,7 @@ void display()
   glClear(GL_COLOR_BUFFER_BIT);
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // background color
 
-  texture_background = MatToTexture(im);
+  texture_background = MatToTexture(im); //gl 이미지로 맵핑
   if (texture_background < 0)
     return;
 
@@ -1352,7 +1352,6 @@ void display()
   glColor3f(1.0f, 1.0f, 1.0f); //큐브나 좌표축 그릴 때 사용한 색의 영향을 안받을려면 필요
   glBindTexture(GL_TEXTURE_2D, texture_background);
   draw_background();
-  //glDisable(GL_TEXTURE_2D);
   glPushMatrix();
 
   float deltaX = xp - cx;
@@ -2657,10 +2656,9 @@ int main(int argc, char **argv)
     exit(0);
   }
 
-  
-//   if (err = pthread_create(&p[0], NULL, mySound, NULL))
-//     printf("child 1 was not born\n");
-//  cout<<"3"<<endl;
+  if (err = pthread_create(&p[0], NULL, mySound, NULL))
+    printf("child 1 was not born\n");
+
   
   if (user_idx != -1)
   {
