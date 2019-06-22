@@ -42,12 +42,12 @@
 
 우분투에서 웹카메라를 활성화하기 위해선 두가지의 옵션이 있습니다.
 
-> (1) Virtual Box를 사용하는 경우
+ (1) Virtual Box를 사용하는 경우
 
 * [Virtual Box](https://www.virtualbox.org/wiki/Downloads)로 이동하여 설치된 Virtual Box 버전과 맞는 Extension Pack을 설치해주세요.
 * 웹캠을 활성화해주세요.
 
-> (2) 가상머신 없이 우분투를 사용하는 경우
+ (2) 가상머신 없이 우분투를 사용하는 경우
 * 바로 아래 단계로 이동해주세요.
 
 ** 웹카메라가 정상적으로 실행되는지 확인하시려면 cheese를 설치하셔서 확인하세요.
@@ -83,7 +83,8 @@ $ ./face_tracker
 
 
 ## 실행 화면
-
+1. 인트로
+![intro](./gameImage/intro.bmp)
 
 
 
