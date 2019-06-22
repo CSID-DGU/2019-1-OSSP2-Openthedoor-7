@@ -39,10 +39,6 @@ ranking(user_idx);
 quit(myId, user_idx);
 }
 
- 
-
- 
-
 int mygetch(void)
 {
     struct termios oldt,
@@ -56,8 +52,6 @@ int mygetch(void)
     tcsetattr( STDIN_FILENO, TCSANOW, &oldt );
     return ch;
 }
-
- 
 
 void getPwd(char * myPwd)
 {
@@ -117,7 +111,7 @@ int first(char * myId, char * myPwd, int flag)
     scanf("%s", myId);
 
     printf("\tPW : ");
-    scanf("%s", myPwd);
+    getPwd(myPwd);
     printf("\n\n");
 
     printf("\t[1]signup [2]signin : ");
@@ -131,7 +125,6 @@ int first(char * myId, char * myPwd, int flag)
                 //printf("connect error");
 
             }
-
             sprintf(buff, "%c|%s|%s", '1', myId, myPwd);
             write(sock, buff, sizeof(buff)); // send socket to server
             memset(buff, 0x00, sizeof(buff)); // empty buffer
@@ -143,7 +136,6 @@ int first(char * myId, char * myPwd, int flag)
             printf("%s\n", buff);
 
             if (buff != NULL) {
-       
             user_idx = (atoi)(buff);
 
                 if( user_idx == -1 ){
@@ -163,8 +155,6 @@ int first(char * myId, char * myPwd, int flag)
                 //printf("connect error");
                         }
 
- 
-
             sprintf(buff, "%c|%s|%s", '2', myId, myPwd);
 
             write(sock, buff, sizeof(buff)); // send socket to server
@@ -179,23 +169,15 @@ int first(char * myId, char * myPwd, int flag)
             if (buff != NULL) {
 
                 user_idx = (atoi)(buff);
-
                 if( user_idx == -2 ){
-
-            printf("\t pwd error !\n");
-
+                printf("\t pwd error !\n");
                 return first(myId,myPwd,3);
-
                   }   
 
                 else{
-
                 printf("\n success !");
-
                 }
-
             }
-
         }
 
        
@@ -207,9 +189,8 @@ int first(char * myId, char * myPwd, int flag)
             printf("\tID : ");
             getchar();
             scanf("%s", myId);
-
             printf("\tPW : ");
-            scanf("%s", myPwd);
+            getPwd(myPwd);
             printf("\n\n");
         }
 
@@ -217,6 +198,7 @@ int first(char * myId, char * myPwd, int flag)
        
     return user_idx;
 }
+
 
 void ranking(int user_idx)
 {
@@ -273,6 +255,7 @@ int i = 0;                     // 문자열 포인터 배열의 인덱스로 사
 
 }
 
+
 void quit(char * name, int user_idx)
 {
     char end;
@@ -316,7 +299,6 @@ void quit(char * name, int user_idx)
 }
 
  
-
 int previousScore() {
 
     int sock, previous_score;
@@ -333,9 +315,7 @@ int previousScore() {
     serv_addr.sin_port = htons(3090);
 
     if (connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) == -1) {
-
         //printf("connect error");
-
     }
 
     //socre get
@@ -352,7 +332,6 @@ int previousScore() {
 }
 
  
-
 void ScoreUpdate()
 {
     int sock;
@@ -379,11 +358,9 @@ void ScoreUpdate()
     read(sock, buff, sizeof(buff));
 
     close(sock);
-
 }
 
  
-
 int rankGet()
 {
     int sock, rank;
@@ -419,9 +396,6 @@ int rankGet()
 
 }
 
- 
-
- 
 
 int firstScoreGet()
 {
@@ -441,7 +415,6 @@ int firstScoreGet()
     if (connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) == -1) {
         //printf("connect error");
     }
-
 
     memset(buff, 0x00, sizeof(buff));
     sprintf(buff, "%c|", '8');
