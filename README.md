@@ -143,9 +143,29 @@ Server
 </pre>
 <pre>
 FaceTracker
-  |src
-    |exe
-       | face_tracker.cc # Main File
+├── src
+│    ├── exe
+│    |    └── face_tracker.cc # Main File
+│    └── lib
+│         ├── CLM.cc
+│         ├── FCheck.cc
+│         ├── FDet.cc
+│         ├── IO.cc
+│         ├── Patch.cc
+│         ├── PAW.cc
+│         ├── PDM.cc
+│         └── Tracker.cc
+└── include
+       └── FaceTracker
+                ├── audio.h
+                ├── CLM.h
+                ├── FCheck.h
+                ├── FDet.h
+                ├── IO.h
+                ├── Patch.h
+                ├── PAW.h
+                ├── PDM.h
+                └── Tracker.h
 </pre>
 
 ## 문의
