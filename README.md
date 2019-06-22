@@ -111,12 +111,9 @@ $ ./face_tracker
 ## 디렉토리 구조 
 <pre>
 Server
-
 ├── app.js
 ├── bin
-│   └── www
 ├── config
-│   └── dbPool.js
 ├── module
 │   └── pool.js
 ├── node_modules
@@ -124,7 +121,6 @@ Server
 ├── package.json
 ├── package-lock.json
 ├── public
-│   └── stylesheets
 ├── routes
 │   ├── first.js
 │   ├── index.js
@@ -135,9 +131,7 @@ Server
 │   ├── signup.js
 │   └── users.js
 └── views
-    ├── error.jade
-    ├── index.jade
-    └── layout.jade
+    
 </pre>
 <pre>
 FaceTracker
@@ -147,5 +141,7 @@ FaceTracker
 </pre>
 
 ## 문의
-작동 오류 문의 - 신소희(skysohe@naver.com) 이미란(rannan09@naver.com)
-
+작동 오류 문의 - 김예지()
+                김혜지()
+                신소희(skysohe@naver.com) 
+                이미란(rannan09@naver.com)
