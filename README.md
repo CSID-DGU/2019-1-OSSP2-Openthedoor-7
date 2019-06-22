@@ -31,8 +31,8 @@
 
 ## 개발 환경
 * Develop Tool: C++, Open CV, Open GL Node.js, MySQL, aws ec2, aws RDS
+* Develop Environment: Ubuntu Linux Extension Pack (16.04 버전 사용, 18.04 )
 
-* Develop Environment: Ubuntu Linux (16.04 버전 사용)
 
 
 ## 실행 방법
