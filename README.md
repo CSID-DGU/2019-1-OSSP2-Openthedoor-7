@@ -7,28 +7,6 @@
 * Node.js, AWS EC2, RDS를 이용한 서버 및 DB 구축
 
 
-## 팀원
-<pre>
-김예지(2017112065) - Open GL 도형 구현
-김혜지(2017112082) - 서버, 소켓 구현
-신소희(2017112106) - 팀장, 서버, 소켓 구현
-이미란(2017112076) - Face tracker 및 Open CV 영상 처리, UI제작
-</pre>
-
-
-## 오픈소스 출처
-
-* FaceTracker
-<https://github.com/kylemcdonald/FaceTracker>
-* OpenCV
-<https://github.com/opencv/opencv> 
-* OpenGL
-<https://www.opengl.org/>
-* Node.js
-<https://nodejs.org/ko/>
-
-
-
 ## 개발 환경
 <pre>
 - Develop Tool: C++, Open CV2, Open GL, Node.js, MySQL, aws ec2, aws RDS
@@ -107,6 +85,27 @@ $ ./face_tracker
 
 ![rank1](./gameImage/r_rank.png)
 ![rank2](./gameImage/r_rank_end.png)
+
+
+## 팀원
+<pre>
+김예지(2017112065) - Open GL 도형 구현
+김혜지(2017112082) - 서버, 소켓 구현
+신소희(2017112106) - 팀장, 서버, 소켓 구현
+이미란(2017112076) - Face tracker 및 Open CV 영상 처리, UI제작
+</pre>
+
+
+## 오픈소스 출처
+
+* FaceTracker
+<https://github.com/kylemcdonald/FaceTracker>
+* OpenCV
+<https://github.com/opencv/opencv> 
+* OpenGL
+<https://www.opengl.org/>
+* Node.js
+<https://nodejs.org/ko/>
 
 
 ## 디렉토리 구조 
