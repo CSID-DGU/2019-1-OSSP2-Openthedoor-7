@@ -52,6 +52,7 @@
 
 ** 웹카메라가 정상적으로 실행되는지 확인하시려면 cheese를 설치하셔서 확인하세요.
 
+
 ### 2. OpenCV 설치하기
 <pre>
 $ sudo apt-get update
@@ -62,6 +63,7 @@ OpenCV 버전2 설치를 권장합니다. 우분투 버전에 맞게 설치를 �
 
 위의 명령어로 설치가 정상적으로 진행되지 않는다면 [OpenCV GitHub](https://github.com/opencv/opencv)에 가서 매뉴얼대로 설치를 진행해주세요.
 
+
 ### 3. OpenGL 설치하기
 <pre>
 $ sudo apt-get update
@@ -69,6 +71,7 @@ $ sudo apt-get install -y build-essential
 $ sudo apt-get install freeglut3-dev libglu1-mesa-dev mesa-common-dev
 $ sudo apt-get install libsdl2-dev  # 사운드
 </pre>
+
 
 ### 4. 실행하기
 <pre>
@@ -83,16 +86,38 @@ $ ./face_tracker
 
 
 ## 실행 화면
-1. 인트로
-![intro](./gameImage/intro.bmp)
+### 1. INTRO
 
+![intro](./gameImage/r_intro.png)
+
+### 2. GAME RULE
+
+![rule1](./gameImage/r_rule1.png)
+![rule2](./gameImage/r_rule2.png)
+![rule3](./gameImage/r_rule3.png)
+![rule4](./gameImage/r_rule4.png)
+
+### 3. GAME
+
+![game1](./gameImage/r_game.png)
+![game2](./gameImage/r_game2.png)
+![game3](./gameImage/r_game3.png)
+
+### 4. RANK
+
+![rank1](./gameImage/r_rank.png)
+![rank2](./gameImage/r_rank_end.png)
 
 
 ## 디렉토리 구조 
 <pre>
-
-
-
+Server
+</pre>
+<pre>
+FaceTracker
+  |src
+    |exe
+       | face_tracker.cc # Main File
 </pre>
 
 ## 문의
