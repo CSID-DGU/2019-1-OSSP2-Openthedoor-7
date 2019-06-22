@@ -64,7 +64,7 @@ $ ./face_tracker
 
 
 ## 실행 화면
-### 0. login
+### 0. LOGIN
 
 ![signup](./gameImage/signup.png)
 ![signin](./gameImage/signin.png)
