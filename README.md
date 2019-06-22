@@ -64,6 +64,10 @@ $ ./face_tracker
 
 
 ## 실행 화면
+### 0. login
+
+![login](./gameImage/r_login.png)
+
 ### 1. INTRO
 
 ![intro](./gameImage/r_intro.png)
